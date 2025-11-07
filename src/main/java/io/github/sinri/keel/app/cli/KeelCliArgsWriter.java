@@ -1,4 +1,4 @@
-package io.github.sinri.keel.facade.cli;
+package io.github.sinri.keel.app.cli;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
