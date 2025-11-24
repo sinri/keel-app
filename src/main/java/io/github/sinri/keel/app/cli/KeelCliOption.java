@@ -1,9 +1,9 @@
 package io.github.sinri.keel.app.cli;
 
 import io.github.sinri.keel.base.annotations.TechnicalPreview;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,31 +12,29 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
- * Represents a command-line option or flag for a CLI application. This class enables defining
- * options with an ID, aliases, description, a value, and an optional validation mechanism.
- * The KeelCliOption also supports flags, which are boolean options without values.
+ * 表示CLI应用程序的命令行选项或标志。该类支持定义带有ID、别名、描述、值的选项，
+ * 以及可选的验证机制。KeelCliOption 还支持标志，这些是没有值的布尔选项。
  * <p>
- * This class is marked as a technical preview, and its APIs are subject to change in future releases.
+ * 该类被标记为技术预览版本，其API可能会在未来的版本中发生变化。
  * <p>
- * Features: <br>
- * - Supports short (e.g., `-o`) and long (e.g., `--option`) options. <br>
- * - Allows defining multiple aliases for a single option. <br>
- * - Provides validation for aliases against a predefined pattern. <br>
- * - Supports optional description for the CLI option. <br>
- * - Allows configuring the option as a flag (boolean without associated values). <br>
- * - Offers an optional value validator to validate input values dynamically. <br>
- * - Protects internal state with an immutable alias set. <br>
- *
- * @since 4.1.1
+ * 功能特性：<br>
+ * - 支持短选项（例如 `-o`）和长选项（例如 `--option`）。<br>
+ * - 允许为单个选项定义多个别名。<br>
+ * - 提供针对预定义模式的别名验证。<br>
+ * - 支持为CLI选项添加可选描述。<br>
+ - 允许将选项配置为标志（布尔值，无关联值）。<br>
+ * - 提供可选的值验证器来动态验证输入值。<br>
+ * - 通过不可变的别名集保护内部状态。<br>
+ * @since 5.0.0
  */
 @TechnicalPreview(since = "4.1.1")
 public class KeelCliOption {
     private final static Pattern VALID_ALIAS_PATTERN = Pattern.compile("^[A-Za-z0-9_.][A-Za-z0-9_.-]*$");
     private final static Pattern VALID_SHORT_PATTERN = Pattern.compile("^-[A-Za-z0-9_]$");
     private final static Pattern VALID_LONG_PATTERN = Pattern.compile("^--[A-Za-z0-9_.][A-Za-z0-9_.-]*$");
-    @Nonnull
+    @NotNull
     private final String id;
-    @Nonnull
+    @NotNull
     private final Set<String> aliasSet;
     @Nullable
     private String description;
@@ -45,9 +43,8 @@ public class KeelCliOption {
     private Function<String, Boolean> valueValidator;
 
     /**
-     * Default constructor for the `KeelCliOption` class.
-     * This constructor initializes a new instance of the `KeelCliOption` class with a unique identifier
-     * and an empty set of aliases.
+     * KeelCliOption 类的默认构造函数。
+     * 该构造函数用唯一标识符和空别名集初始化 KeelCliOption 类的新实例。
      */
     public KeelCliOption() {
         this.id = UUID.randomUUID().toString();
@@ -55,17 +52,16 @@ public class KeelCliOption {
     }
 
     /**
-     * Parses the option name from a given argument string.
-     * The method checks if the argument matches either a long or short option pattern
-     * and extracts the corresponding option name without the leading dashes.
+     * 从给定的参数字符串中解析选项名称。
+     * 该方法检查参数是否匹配长选项或短选项模式，并提取相应的选项名称（不包含前面的破折号）。
      * <p>
-     * The provided argument string must not be null, and should process {@code --} other than this method.
+     * 提供的参数字符串不能为null，除该方法外不应处理 {@code --}。
      *
-     * @param argument the command-line argument string to parse; must not be null
-     * @return the extracted option name if the argument matches an option format, or null if it does not match
+     * @param argument 要解析的命令行参数字符串；不能为null
+     * @return 如果参数匹配选项格式则返回提取的选项名称，否则返回null
      */
     @Nullable
-    static String parseOptionName(@Nonnull String argument) {
+    static String parseOptionName(@NotNull String argument) {
         if ("--".equals(argument)) return null;
         if (argument.startsWith("--")) {
             if (VALID_LONG_PATTERN.matcher(argument).matches()) {
@@ -81,12 +77,12 @@ public class KeelCliOption {
     }
 
     /**
-     * Validates the given alias string against a pre-defined pattern.
-     * The alias cannot be null, and it must match the defined valid alias pattern.
-     * If validation fails, an IllegalArgumentException is thrown.
+     * 针对预定义模式验证给定的别名字符串。
+     * 别名不能为null，必须匹配定义的别名模式。
+     * 如果验证失败，抛出 IllegalArgumentException。
      *
-     * @param alias the alias string to validate; must not be null and must match the valid alias pattern
-     * @throws IllegalArgumentException if the alias is null or does not match the valid alias pattern
+     * @param alias 要验证的别名字符串；不能为null且必须匹配别名模式
+     * @throws IllegalArgumentException 如果别名为null或不匹配别名模式
      */
     public static String validatedAlias(String alias) {
         if (alias == null || !VALID_ALIAS_PATTERN.matcher(alias).matches()) {
@@ -96,29 +92,29 @@ public class KeelCliOption {
     }
 
     /**
-     * Retrieves the unique identifier of this option.
-     * The identifier is automatically generated, not defined by users.
+     * 获取此选项的唯一标识符。
+     * 该标识符是自动生成的，不是由用户定义的。
      *
-     * @return the identifier of this option as a string
+     * @return 此选项的字符串标识符
      */
     public String id() {
         return id;
     }
 
     /**
-     * Retrieves the description of this command-line option.
+     * 获取此命令行选项的描述。
      *
-     * @return the description of the option as a string
+     * @return 选项的字符串描述
      */
     public String description() {
         return description;
     }
 
     /**
-     * Sets the description for this command-line option.
+     * 为此命令行选项设置描述。
      *
-     * @param description the description of the command-line option
-     * @return the current instance of {@code KeelCliOption} for method chaining
+     * @param description 命令行选项的描述
+     * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
      */
     public KeelCliOption description(String description) {
         this.description = description;
@@ -126,21 +122,21 @@ public class KeelCliOption {
     }
 
     /**
-     * Checks if the current command-line option is a flag.
-     * A flag represents an option with no value, typically used as a boolean switch.
+     * 检查当前命令行选项是否为标志。
+     * 标志代表没有值的选项，通常用作布尔开关。
      *
-     * @return {@code true} if the option is a flag, {@code false} otherwise
+     * @return 如果选项是标志返回 {@code true}，否则返回 {@code false}
      */
     public boolean isFlag() {
         return flag;
     }
 
     /**
-     * Marks the current command-line option as a flag.
-     * A flag represents an option with no value, typically used as a boolean switch.
-     * This method sets the internal flag state to true and enables method chaining.
+     * 将当前命令行选项标记为标志。
+     * 标志代表没有值的选项，通常用作布尔开关。
+     * 该方法将内部标志状态设置为true，并启用方法链式调用。
      *
-     * @return the current instance of {@code KeelCliOption} for method chaining
+     * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
      */
     public KeelCliOption flag() {
         this.flag = true;
@@ -148,11 +144,10 @@ public class KeelCliOption {
     }
 
     /**
-     * Retrieves the value validator function associated with this command-line option.
-     * The value validator is a function that takes a string as input and returns a boolean
-     * indicating whether the provided value is valid for this option.
+     * 获取与此命令行选项关联的值验证器函数。
+     * 值验证器是一个函数，以字符串作为输入，返回布尔值指示提供的值是否对此选项有效。
      *
-     * @return a function for validating option values, or {@code null} if no validator is set
+     * @return 用于验证选项值的函数，如果未设置验证器则返回 {@code null}
      */
     @Nullable
     public Function<String, Boolean> getValueValidator() {
@@ -160,13 +155,11 @@ public class KeelCliOption {
     }
 
     /**
-     * Sets a value validator function for this command-line option.
-     * The value validator is a function that takes a string input and returns a boolean
-     * indicating whether the provided value is valid for this option.
+     * 为此命令行选项设置值验证器函数。
+     * 值验证器是一个函数，以字符串作为输入，返回布尔值指示提供的值是否对此选项有效。
      *
-     * @param valueValidator the function to be used for validating the option's value,
-     *                       or {@code null} if no validation is required
-     * @return the current instance of {@code KeelCliOption} for method chaining
+     * @param valueValidator 用于验证选项值的函数，如果不需要验证则可以设置为 {@code null}
+     * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
      */
     public KeelCliOption setValueValidator(@Nullable Function<String, Boolean> valueValidator) {
         this.valueValidator = valueValidator;
@@ -174,15 +167,14 @@ public class KeelCliOption {
     }
 
     /**
-     * Adds an alias to the current command-line option.
-     * The alias must be valid, according to the predefined alias pattern,
-     * and it is validated before being added to the set of aliases.
+     * 为当前命令行选项添加别名。
+     * 别名必须有效，根据预定义的别名模式，在添加到别名集之前会进行验证。
      *
-     * @param alias the alias string to add; must not be null and must match the valid alias pattern
-     * @return the current instance of {@code KeelCliOption} for method chaining
-     * @throws KeelCliArgsDefinitionError if the alias is null or does not match the valid alias pattern
+     * @param alias 要添加的别名字符串；不能为null且必须匹配别名模式
+     * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
+     * @throws KeelCliArgsDefinitionError 如果别名为null或不匹配别名模式
      */
-    public KeelCliOption alias(@Nonnull String alias) throws KeelCliArgsDefinitionError {
+    public KeelCliOption alias(@NotNull String alias) throws KeelCliArgsDefinitionError {
         try {
             this.aliasSet.add(validatedAlias(alias));
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -192,10 +184,10 @@ public class KeelCliOption {
     }
 
     /**
-     * Retrieves the set of aliases associated with this command-line option.
-     * The returned set is immutable and reflects the current state of aliases.
+     * 获取与此命令行选项关联的别名集。
+     * 返回的集合是不可变的，反映了别名的当前状态。
      *
-     * @return an unmodifiable set of alias strings associated with this option
+     * @return 与此选项关联的不可变别名字符串集合
      */
     public Set<String> getAliasSet() {
         return Collections.unmodifiableSet(aliasSet);

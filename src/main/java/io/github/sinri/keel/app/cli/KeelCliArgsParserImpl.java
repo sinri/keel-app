@@ -1,14 +1,21 @@
 package io.github.sinri.keel.app.cli;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * KeelCliArgsParser 接口的实现类。
+ * 该类负责实际的命令行参数解析逻辑。
+ *
+ * @since 5.0.0
+ */
 class KeelCliArgsParserImpl implements KeelCliArgsParser {
     private final Map<String, KeelCliOption> optionMap = new HashMap<>();
     private final Map<String, String> nameToOptionIdMap = new HashMap<>();
 
-    public void addOption(@Nonnull KeelCliOption option) throws KeelCliArgsDefinitionError {
+    public void addOption(@NotNull KeelCliOption option) throws KeelCliArgsDefinitionError {
         if (optionMap.containsKey(option.id())) {
             throw new KeelCliArgsDefinitionError("Duplicate named argument definition id: " + option.id());
         }
@@ -28,7 +35,7 @@ class KeelCliArgsParserImpl implements KeelCliArgsParser {
         }
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public KeelCliArgs parse(String[] args) throws KeelCliArgsParseError {
         var parsedResult = KeelCliArgsWriter.create();

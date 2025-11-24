@@ -1,16 +1,12 @@
 package io.github.sinri.keel.app.cli;
 
 
-import io.github.sinri.keel.base.annotations.TechnicalPreview;
-
 /**
- * An exception defined for CommandLineParser preparation before parsing the command line.
+ * 为在解析命令行之前进行 CommandLineParser 准备而定义的异常。
  * <p>
- * Expected thrown causes: duplicated options defining, null option naming, etc.
- *
- * @since 4.1.1
+ * 预期抛出原因：重复定义选项、选项名称为空等。
+ * @since 5.0.0
  */
-@TechnicalPreview(since = "4.1.1")
 public class KeelCliArgsDefinitionError extends RuntimeException {
     public KeelCliArgsDefinitionError(String msg) {
         super(msg);

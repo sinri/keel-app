@@ -1,18 +1,13 @@
 package io.github.sinri.keel.app.cli;
 
 
-import io.github.sinri.keel.base.annotations.TechnicalPreview;
 
 /**
- * An exception that represents an error occurring during the parsing of command-line arguments
- * by a {@code CommandLineParser}.
+ * 表示在通过 {@code CommandLineParser} 解析命令行参数期间发生的错误的异常。
  * <p>
- * This exception is typically thrown when the command-line parsing process encounters invalid input,
- * such as improperly formatted options, unknown flags, missing required parameters, or other parsing-related issues.
- *
- * @since 4.1.1
+ * 当命令行解析过程遇到无效输入时，通常会抛出此异常，例如格式不正确的选项、未知标志、缺少必需参数或其他解析相关问题。
+ * @since 5.0.0
  */
-@TechnicalPreview(since = "4.1.1")
 public class KeelCliArgsParseError extends Exception {
     public KeelCliArgsParseError(String message) {
         super(message);

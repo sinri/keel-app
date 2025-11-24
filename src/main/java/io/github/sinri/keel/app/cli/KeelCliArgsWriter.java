@@ -1,16 +1,43 @@
 package io.github.sinri.keel.app.cli;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+
+/**
+ * 用于记录和写入命令行参数解析结果的接口。
+ *
+ * @since 5.0.0
+ */
 interface KeelCliArgsWriter {
+    /**
+     * 创建 KeelCliArgsWriter 实例的工厂方法。
+     *
+     * @return 新的 KeelCliArgsWriter 实例
+     */
     static KeelCliArgsWriter create() {
         return new KeelCliArgsImpl();
     }
 
-    void recordParameter(@Nonnull String parameter);
+    /**
+     * 记录一个位置参数。
+     *
+     * @param parameter 要记录的位置参数
+     */
+    void recordParameter(@NotNull String parameter);
 
-    void recordOption(@Nonnull KeelCliOption option, @Nullable String value);
+    /**
+     * 记录一个选项及其值。
+     *
+     * @param option 要记录的选项
+     * @param value  选项的值，如果选项是标志则为null
+     */
+    void recordOption(@NotNull KeelCliOption option, @Nullable String value);
 
+    /**
+     * 将当前的记录结果转换为 KeelCliArgs 对象。
+     *
+     * @return 包含所有记录选项和参数的 KeelCliArgs 对象
+     */
     KeelCliArgs toResult();
 }

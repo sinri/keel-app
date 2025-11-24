@@ -2,27 +2,26 @@ package io.github.sinri.keel.app.cli;
 
 
 import io.github.sinri.keel.base.annotations.TechnicalPreview;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
- * Represents the results of parsing command-line arguments. It provides methods
- * to retrieve options, flags, and positional parameters from the parsed input.
+ * 表示命令行参数解析结果的接口。提供了从解析输入中检索选项、标志和位置参数的方法。
  * <p>
- * This interface is marked as a technical preview and may be subject to changes.
+ * 该接口被标记为技术预览版本，可能会发生变化。
+ * @since 5.0.0
  */
 @TechnicalPreview(since = "4.1.1")
 public interface KeelCliArgs {
 
     /**
-     * Retrieves the value of an option specified by its short name,
-     * delegating to the {@link #readOption(String)} method.
+     * 根据短名称检索选项的值，委托给 {@link #readOption(String)} 方法。
      *
-     * @param shortName the single-character name of the option to retrieve
-     * @return if the option is not provided, return {@code null};
-     *         if the option is provided and as a flag, return {@code ""};
-     *         otherwise return the provided value for the option.
+     * @param shortName 要检索的选项的单字符名称
+     * @return 如果选项未提供，返回 {@code null}；
+     *         如果选项作为标志提供，返回 {@code ""}；
+     *         否则返回为选项提供的值。
      */
     @Nullable
     default String readOption(char shortName) {
@@ -30,47 +29,46 @@ public interface KeelCliArgs {
     }
 
     /**
-     * Retrieves the value of an option specified by its long name.
+     * 根据长名称检索选项的值。
      *
-     * @param longName the full name of the option to retrieve; must not be null
-     * @return if the option is not provided, return {@code null};
-     *         if the option is provided and as a flag, return {@code ""};
-     *         otherwise return the provided value to the option.
+     * @param longName 要检索的选项的完整名称；不能为null
+     * @return 如果选项未提供，返回 {@code null}；
+     *         如果选项作为标志提供，返回 {@code ""}；
+     *         否则返回为选项提供的值。
      */
     @Nullable
-    String readOption(@Nonnull String longName);
+    String readOption(@NotNull String longName);
 
     /**
-     * Checks if an option represented by a short name is present in the parsed command-line arguments.
+     * 检查解析后的命令行参数中是否存在由短名称表示的选项。
      * <p>
-     * Note, an option is also treated as a flag in this method.
+     * 注意，在此方法中选项也被视为标志。
      *
-     * @param shortName the single-character name of the flag to check
-     * @return true if the specified flag is present; false otherwise
+     * @param shortName 要检查的标志的单字符名称
+     * @return 如果指定的标志存在返回true；否则返回false
      */
     default boolean readFlag(char shortName) {
         return readFlag(String.valueOf(shortName));
     }
 
     /**
-     * Checks if an option represented by a long name is present in the parsed command-line arguments.
+     * 检查解析后的命令行参数中是否存在由长名称表示的选项。
      * <p>
-     * Note, an option is also treated as a flag in this method.
+     * 注意，在此方法中选项也被视为标志。
      *
-     * @param longName the full name of the flag to check; must not be null
-     * @return true if the specified flag is present; false otherwise
+     * @param longName 要检查的标志的完整名称；不能为null
+     * @return 如果指定的标志存在返回true；否则返回false
      */
-    boolean readFlag(@Nonnull String longName);
+    boolean readFlag(@NotNull String longName);
 
     /**
-     * Retrieves the value of a positional parameter by index.
+     * 根据索引检索位置参数的值。
      * <p>
-     * The index of a parameter is not always the index as the raw argument,
-     * for the mixed format with options, the index is the position after {@code --}.
+     * 参数的索引并不总是与原始参数的索引相同，
+     * 对于带有选项的混合格式，索引是 {@code --} 之后的位置。
      *
-     * @param index the zero-based index of the positional parameter to retrieve
-     * @return the value of the positional parameter at the given index,
-     *         or null if the parameter is not present
+     * @param index 要检索的位置参数的零基索引
+     * @return 给定索引处位置参数的值，如果参数不存在则返回null
      */
     @Nullable
     String readParameter(int index);

@@ -1,48 +1,42 @@
 package io.github.sinri.keel.app.cli;
 
-import io.github.sinri.keel.base.annotations.TechnicalPreview;
 import io.vertx.core.Handler;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Support to parse command-line arguments like:
+ * 支持解析类似以下的命令行参数：
  * <p>
- * Mixed Format: options and flags ahead, then, if needed, a {@code --} mark (which is required) and parameters. <br>
+ * 混合格式：选项和标志在前，然后如果需要，使用 {@code --} 标记（必需）和参数。 <br>
  * {@code java -jar my-app.jar
  * --long-option-name long-option-value -s short-option-value --flag-name -f -- Parameter1 Parameter2}
  * <p>
- * Parameter-Only Format: no options nor flags, parameters only, {@code --} mark is not required.<br>
+ * 纯参数格式：无选项或标志，只有参数，{@code --} 标记不是必需的。<br>
  * {@code java -jar my-app.jar Parameter1 Parameter2}
  * <p>
- * Definitions:<br>
- * Option: a flag with a short name or a long name, and followed by a value, e.g. {@code --option1 value1}.<br>
- * Flag: a flag with a short name or a long name, e.g. {@code -f} or {@code --no-output}.<br>
- * Parameter: a parameter that is not an option or flag, without named label but indexed,
- * usually on the head or at the tail after {@code --}, e.g. {@code Parameter1} or {@code  -- Parameter2}.
- *
- * @since 4.1.1
+ * 定义：<br>
+ * 选项：带有短名称或长名称的标志，后跟一个值，例如 {@code --option1 value1}。<br>
+ * 标志：带有短名称或长名称的标志，例如 {@code -f} 或 {@code --no-output}。<br>
+ * 参数：不是选项或标志的参数，没有命名标签但有索引，通常在开头或在 {@code --} 之后，例如 {@code Parameter1} 或 {@code  -- Parameter2}。
+ * @since 5.0.0
  */
-@TechnicalPreview(since = "4.1.1")
 public interface KeelCliArgsParser {
     static KeelCliArgsParser create() {
         return new KeelCliArgsParserImpl();
     }
 
     /**
-     * Parses the given array of command-line arguments and returns a result
-     * containing the parsed options, flags, and arguments.
+     * 解析给定的命令行参数数组，并返回一个包含解析选项、标志和参数的结果对象。
      *
-     * @param args the array of command-line arguments to parse, from a main method's args parameter
-     * @return a result object representing the parsed command-line options, flags, and arguments
-     * @throws KeelCliArgsParseError if the parsing fails
+     * @param args 要解析的命令行参数数组，来自 main 方法的 args 参数
+     * @return 表示解析后的命令行选项、标志和参数的结果对象
+     * @throws KeelCliArgsParseError 如果解析失败
      */
-    @Nonnull
+    @NotNull
     KeelCliArgs parse(String[] args) throws KeelCliArgsParseError;
 
-    void addOption(@Nonnull KeelCliOption option) throws KeelCliArgsDefinitionError;
+    void addOption(@NotNull KeelCliOption option) throws KeelCliArgsDefinitionError;
 
-    default void addOption(@Nonnull Handler<KeelCliOption> optionHandler) throws KeelCliArgsDefinitionError {
+    default void addOption(@NotNull Handler<KeelCliOption> optionHandler) throws KeelCliArgsDefinitionError {
         KeelCliOption option = new KeelCliOption();
         optionHandler.handle(option);
         addOption(option);

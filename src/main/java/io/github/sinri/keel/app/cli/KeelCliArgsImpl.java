@@ -1,34 +1,38 @@
 package io.github.sinri.keel.app.cli;
 
-import io.github.sinri.keel.base.annotations.TechnicalPreview;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 
-@TechnicalPreview(since = "4.1.1")
+/**
+ * KeelCliArgs 和 KeelCliArgsWriter 接口的实现类。
+ * 该类负责存储和操作解析后的命令行参数数据。
+ *
+ * @since 5.0.0
+ */
 class KeelCliArgsImpl implements KeelCliArgs, KeelCliArgsWriter {
     /**
-     * Map option id to option.
+     * 将选项ID映射到选项对象的映射表。
      */
     private final Map<String, KeelCliOption> idToOptionMap = new HashMap<>();
     /**
-     * Map long name to option id.
+     * 将选项长名称映射到选项ID的映射表。
      */
     private final Map<String, String> nameToOptionIdMap = new HashMap<>();
     /**
-     * Map option id to option value (if the option is a flag, the value is null).
+     * 将选项ID映射到选项值的映射表（如果选项是标志，则值为null）。
      */
     private final Map<String, String> idToOptionValueMap = new HashMap<>();
     /**
-     * List of parameters.
+     * 位置参数列表。
      */
     private final List<String> parameters = new ArrayList<>();
 
     public KeelCliArgsImpl() {
     }
 
-    public void recordOption(@Nonnull KeelCliOption option, @Nullable String value) {
+    public void recordOption(@NotNull KeelCliOption option, @Nullable String value) {
         idToOptionMap.put(option.id(), option);
         Set<String> aliasSet = option.getAliasSet();
         for (var alias : aliasSet) {
@@ -40,7 +44,7 @@ class KeelCliArgsImpl implements KeelCliArgs, KeelCliArgsWriter {
 
     @Nullable
     @Override
-    public String readOption(@Nonnull String longName) {
+    public String readOption(@NotNull String longName) {
         String optionId = nameToOptionIdMap.get(longName);
         if (optionId == null) return null;
         KeelCliOption option = idToOptionMap.get(optionId);
@@ -50,7 +54,7 @@ class KeelCliArgsImpl implements KeelCliArgs, KeelCliArgsWriter {
     }
 
     @Override
-    public boolean readFlag(@Nonnull String longName) {
+    public boolean readFlag(@NotNull String longName) {
         return readOption(longName) != null;
     }
 
@@ -64,7 +68,7 @@ class KeelCliArgsImpl implements KeelCliArgs, KeelCliArgsWriter {
     }
 
     @Override
-    public void recordParameter(@Nonnull String parameter) {
+    public void recordParameter(@NotNull String parameter) {
         parameters.add(parameter);
     }
 
