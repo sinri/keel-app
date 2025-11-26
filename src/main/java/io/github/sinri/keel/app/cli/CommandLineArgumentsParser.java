@@ -17,11 +17,12 @@ import org.jetbrains.annotations.NotNull;
  * 选项：带有短名称或长名称的标志，后跟一个值，例如 {@code --option1 value1}。<br>
  * 标志：带有短名称或长名称的标志，例如 {@code -f} 或 {@code --no-output}。<br>
  * 参数：不是选项或标志的参数，没有命名标签但有索引，通常在开头或在 {@code --} 之后，例如 {@code Parameter1} 或 {@code  -- Parameter2}。
+ *
  * @since 5.0.0
  */
-public interface KeelCliArgsParser {
-    static KeelCliArgsParser create() {
-        return new KeelCliArgsParserImpl();
+public interface CommandLineArgumentsParser {
+    static CommandLineArgumentsParser create() {
+        return new CommandLineArgumentsParserImpl();
     }
 
     /**
@@ -29,15 +30,15 @@ public interface KeelCliArgsParser {
      *
      * @param args 要解析的命令行参数数组，来自 main 方法的 args 参数
      * @return 表示解析后的命令行选项、标志和参数的结果对象
-     * @throws KeelCliArgsParseError 如果解析失败
+     * @throws CommandLineArgumentsParseError 如果解析失败
      */
     @NotNull
-    KeelCliArgs parse(String[] args) throws KeelCliArgsParseError;
+    CommandLineArguments parse(String[] args) throws CommandLineArgumentsParseError;
 
-    void addOption(@NotNull KeelCliOption option) throws KeelCliArgsDefinitionError;
+    void addOption(@NotNull CommandLineOption option) throws CommandLineArgumentsDefinitionError;
 
-    default void addOption(@NotNull Handler<KeelCliOption> optionHandler) throws KeelCliArgsDefinitionError {
-        KeelCliOption option = new KeelCliOption();
+    default void addOption(@NotNull Handler<CommandLineOption> optionHandler) throws CommandLineArgumentsDefinitionError {
+        CommandLineOption option = new CommandLineOption();
         optionHandler.handle(option);
         addOption(option);
     }

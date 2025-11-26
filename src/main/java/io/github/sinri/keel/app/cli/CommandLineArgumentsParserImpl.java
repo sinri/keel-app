@@ -11,25 +11,25 @@ import java.util.function.Function;
  *
  * @since 5.0.0
  */
-class KeelCliArgsParserImpl implements KeelCliArgsParser {
-    private final Map<String, KeelCliOption> optionMap = new HashMap<>();
+class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
+    private final Map<String, CommandLineOption> optionMap = new HashMap<>();
     private final Map<String, String> nameToOptionIdMap = new HashMap<>();
 
-    public void addOption(@NotNull KeelCliOption option) throws KeelCliArgsDefinitionError {
+    public void addOption(@NotNull CommandLineOption option) throws CommandLineArgumentsDefinitionError {
         if (optionMap.containsKey(option.id())) {
-            throw new KeelCliArgsDefinitionError("Duplicate named argument definition id: " + option.id());
+            throw new CommandLineArgumentsDefinitionError("Duplicate named argument definition id: " + option.id());
         }
         optionMap.put(option.id(), option);
 
         Set<String> aliasSet = option.getAliasSet();
         if (aliasSet.isEmpty()) {
-            throw new KeelCliArgsDefinitionError("Option must have at least one alias");
+            throw new CommandLineArgumentsDefinitionError("Option must have at least one alias");
         }
 
         for (var alias : aliasSet) {
             // believe the members in the alias set is all valid
             if (nameToOptionIdMap.containsKey(alias)) {
-                throw new KeelCliArgsDefinitionError("Alias cannot duplicate: " + alias);
+                throw new CommandLineArgumentsDefinitionError("Alias cannot duplicate: " + alias);
             }
             nameToOptionIdMap.put(alias, option.id());
         }
@@ -37,8 +37,8 @@ class KeelCliArgsParserImpl implements KeelCliArgsParser {
 
     @NotNull
     @Override
-    public KeelCliArgs parse(String[] args) throws KeelCliArgsParseError {
-        var parsedResult = KeelCliArgsWriter.create();
+    public CommandLineArguments parse(String[] args) throws CommandLineArgumentsParseError {
+        var parsedResult = CommandLineArgumentsWriter.create();
 
         if (args == null || args.length == 0) {
             return parsedResult.toResult();
@@ -55,7 +55,7 @@ class KeelCliArgsParserImpl implements KeelCliArgsParser {
          */
 
         int mode = 0;
-        KeelCliOption currentOption = null;
+        CommandLineOption currentOption = null;
         for (String arg : args) {
             if (arg == null)
                 continue;
@@ -63,23 +63,23 @@ class KeelCliArgsParserImpl implements KeelCliArgsParser {
                 if ("--".equals(arg)) {
                     mode = 3;
                 } else {
-                    String parsedOptionName = KeelCliOption.parseOptionName(arg);
+                    String parsedOptionName = CommandLineOption.parseOptionName(arg);
                     if (parsedOptionName == null) {
                         if (mode == 0) {
                             // arg is a parameter
                             parameters.add(arg);
                             mode = 3;
                         } else {
-                            throw new KeelCliArgsParseError("Invalid option: " + arg);
+                            throw new CommandLineArgumentsParseError("Invalid option: " + arg);
                         }
                     } else {
                         String optionId = nameToOptionIdMap.get(parsedOptionName);
                         if (optionId == null) {
-                            throw new KeelCliArgsParseError("Option " + parsedOptionName + " not found");
+                            throw new CommandLineArgumentsParseError("Option " + parsedOptionName + " not found");
                         }
                         currentOption = optionMap.get(optionId);
                         if (currentOption == null) {
-                            throw new KeelCliArgsParseError("Option " + parsedOptionName + " not found");
+                            throw new CommandLineArgumentsParseError("Option " + parsedOptionName + " not found");
                         }
                         if (currentOption.isFlag()) {
                             options.put(currentOption.id(), null);
@@ -92,7 +92,7 @@ class KeelCliArgsParserImpl implements KeelCliArgsParser {
                 }
             } else if (mode == 1) {
                 if (currentOption == null) {
-                    throw new KeelCliArgsParseError("Invalid option: " + arg);
+                    throw new CommandLineArgumentsParseError("Invalid option: " + arg);
                 }
                 options.put(currentOption.id(), arg);
                 mode = 2;
@@ -103,18 +103,18 @@ class KeelCliArgsParserImpl implements KeelCliArgsParser {
         }
 
         if (mode == 1 && currentOption != null) {
-            throw new KeelCliArgsParseError("Invalid option: " + currentOption);
+            throw new CommandLineArgumentsParseError("Invalid option: " + currentOption);
         }
 
         for (var entry : options.entrySet()) {
             String optionId = entry.getKey();
             String optionValue = entry.getValue();
-            KeelCliOption option = optionMap.get(optionId);
+            CommandLineOption option = optionMap.get(optionId);
             Function<String, Boolean> valueValidator = option.getValueValidator();
             if (valueValidator != null && !option.isFlag()) {
                 boolean valueValid = valueValidator.apply(optionValue);
                 if (!valueValid) {
-                    throw new KeelCliArgsParseError(
+                    throw new CommandLineArgumentsParseError(
                             "Value for option " + (String.join("/", option.getAliasSet())) + " is not valid.");
                 }
             }

@@ -9,14 +9,14 @@ import org.jetbrains.annotations.Nullable;
  *
  * @since 5.0.0
  */
-interface KeelCliArgsWriter {
+interface CommandLineArgumentsWriter {
     /**
      * 创建 KeelCliArgsWriter 实例的工厂方法。
      *
      * @return 新的 KeelCliArgsWriter 实例
      */
-    static KeelCliArgsWriter create() {
-        return new KeelCliArgsImpl();
+    static CommandLineArgumentsWriter create() {
+        return new CommandLineArgumentsImpl();
     }
 
     /**
@@ -32,12 +32,12 @@ interface KeelCliArgsWriter {
      * @param option 要记录的选项
      * @param value  选项的值，如果选项是标志则为null
      */
-    void recordOption(@NotNull KeelCliOption option, @Nullable String value);
+    void recordOption(@NotNull CommandLineOption option, @Nullable String value);
 
     /**
      * 将当前的记录结果转换为 KeelCliArgs 对象。
      *
      * @return 包含所有记录选项和参数的 KeelCliArgs 对象
      */
-    KeelCliArgs toResult();
+    CommandLineArguments toResult();
 }

@@ -11,11 +11,11 @@ import java.util.*;
  *
  * @since 5.0.0
  */
-class KeelCliArgsImpl implements KeelCliArgs, KeelCliArgsWriter {
+class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgumentsWriter {
     /**
      * 将选项ID映射到选项对象的映射表。
      */
-    private final Map<String, KeelCliOption> idToOptionMap = new HashMap<>();
+    private final Map<String, CommandLineOption> idToOptionMap = new HashMap<>();
     /**
      * 将选项长名称映射到选项ID的映射表。
      */
@@ -29,10 +29,10 @@ class KeelCliArgsImpl implements KeelCliArgs, KeelCliArgsWriter {
      */
     private final List<String> parameters = new ArrayList<>();
 
-    public KeelCliArgsImpl() {
+    public CommandLineArgumentsImpl() {
     }
 
-    public void recordOption(@NotNull KeelCliOption option, @Nullable String value) {
+    public void recordOption(@NotNull CommandLineOption option, @Nullable String value) {
         idToOptionMap.put(option.id(), option);
         Set<String> aliasSet = option.getAliasSet();
         for (var alias : aliasSet) {
@@ -47,7 +47,7 @@ class KeelCliArgsImpl implements KeelCliArgs, KeelCliArgsWriter {
     public String readOption(@NotNull String longName) {
         String optionId = nameToOptionIdMap.get(longName);
         if (optionId == null) return null;
-        KeelCliOption option = idToOptionMap.get(optionId);
+        CommandLineOption option = idToOptionMap.get(optionId);
         if (option == null) return null;
         if (option.isFlag()) return "";
         return idToOptionValueMap.get(optionId);
@@ -73,7 +73,7 @@ class KeelCliArgsImpl implements KeelCliArgs, KeelCliArgsWriter {
     }
 
     @Override
-    public KeelCliArgs toResult() {
+    public CommandLineArguments toResult() {
         return this;
     }
 }

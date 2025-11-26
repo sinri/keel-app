@@ -1,19 +1,16 @@
 package io.github.sinri.keel.app.cli;
 
 
-import io.github.sinri.keel.base.annotations.TechnicalPreview;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
 /**
  * 表示命令行参数解析结果的接口。提供了从解析输入中检索选项、标志和位置参数的方法。
- * <p>
- * 该接口被标记为技术预览版本，可能会发生变化。
+ *
  * @since 5.0.0
  */
-@TechnicalPreview(since = "4.1.1")
-public interface KeelCliArgs {
+public interface CommandLineArguments {
 
     /**
      * 根据短名称检索选项的值，委托给 {@link #readOption(String)} 方法。

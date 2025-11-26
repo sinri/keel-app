@@ -1,6 +1,5 @@
 package io.github.sinri.keel.app.cli;
 
-import io.github.sinri.keel.base.annotations.TechnicalPreview;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +12,7 @@ import java.util.regex.Pattern;
 
 /**
  * 表示CLI应用程序的命令行选项或标志。该类支持定义带有ID、别名、描述、值的选项，
- * 以及可选的验证机制。KeelCliOption 还支持标志，这些是没有值的布尔选项。
+ * 以及可选的验证机制。还支持标志（flag），这些是没有值的布尔选项。
  * <p>
  * 该类被标记为技术预览版本，其API可能会在未来的版本中发生变化。
  * <p>
@@ -27,8 +26,7 @@ import java.util.regex.Pattern;
  * - 通过不可变的别名集保护内部状态。<br>
  * @since 5.0.0
  */
-@TechnicalPreview(since = "4.1.1")
-public class KeelCliOption {
+public class CommandLineOption {
     private final static Pattern VALID_ALIAS_PATTERN = Pattern.compile("^[A-Za-z0-9_.][A-Za-z0-9_.-]*$");
     private final static Pattern VALID_SHORT_PATTERN = Pattern.compile("^-[A-Za-z0-9_]$");
     private final static Pattern VALID_LONG_PATTERN = Pattern.compile("^--[A-Za-z0-9_.][A-Za-z0-9_.-]*$");
@@ -46,7 +44,7 @@ public class KeelCliOption {
      * KeelCliOption 类的默认构造函数。
      * 该构造函数用唯一标识符和空别名集初始化 KeelCliOption 类的新实例。
      */
-    public KeelCliOption() {
+    public CommandLineOption() {
         this.id = UUID.randomUUID().toString();
         this.aliasSet = new HashSet<>();
     }
@@ -116,7 +114,7 @@ public class KeelCliOption {
      * @param description 命令行选项的描述
      * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
      */
-    public KeelCliOption description(String description) {
+    public CommandLineOption description(String description) {
         this.description = description;
         return this;
     }
@@ -138,7 +136,7 @@ public class KeelCliOption {
      *
      * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
      */
-    public KeelCliOption flag() {
+    public CommandLineOption flag() {
         this.flag = true;
         return this;
     }
@@ -161,7 +159,7 @@ public class KeelCliOption {
      * @param valueValidator 用于验证选项值的函数，如果不需要验证则可以设置为 {@code null}
      * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
      */
-    public KeelCliOption setValueValidator(@Nullable Function<String, Boolean> valueValidator) {
+    public CommandLineOption setValueValidator(@Nullable Function<String, Boolean> valueValidator) {
         this.valueValidator = valueValidator;
         return this;
     }
@@ -172,13 +170,13 @@ public class KeelCliOption {
      *
      * @param alias 要添加的别名字符串；不能为null且必须匹配别名模式
      * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
-     * @throws KeelCliArgsDefinitionError 如果别名为null或不匹配别名模式
+     * @throws CommandLineArgumentsDefinitionError 如果别名为null或不匹配别名模式
      */
-    public KeelCliOption alias(@NotNull String alias) throws KeelCliArgsDefinitionError {
+    public CommandLineOption alias(@NotNull String alias) throws CommandLineArgumentsDefinitionError {
         try {
             this.aliasSet.add(validatedAlias(alias));
         } catch (IllegalArgumentException illegalArgumentException) {
-            throw new KeelCliArgsDefinitionError(illegalArgumentException.getMessage());
+            throw new CommandLineArgumentsDefinitionError(illegalArgumentException.getMessage());
         }
         return this;
     }
