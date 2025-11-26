@@ -11,6 +11,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
+/**
+ * 通过日志体系报告和留存的监控服务实现。
+ *
+ * @since 5.0.0
+ */
 class MonitorServiceLoggerImpl extends MonitorService {
     private final long startTimestamp;
     private final @Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier;

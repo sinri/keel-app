@@ -8,6 +8,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
+/**
+ * 通过一个异步逻辑快速构建的服务。
+ *
+ * @since 5.0.0
+ */
 class WrappedService extends AbstractKeelVerticle implements Service {
     @NotNull
     private final Application application;

@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * 通过指标记录体系报告和留存的监控服务实现。
+ *
+ * @since 5.0.0
+ */
 class MonitorServiceMetricImpl extends MonitorService {
     public static final String METRIC_SURVIVED = "survived";
     public static final String METRIC_MINOR_GC_COUNT = "minor_gc_count";

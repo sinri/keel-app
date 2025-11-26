@@ -6,6 +6,11 @@ import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * 通过 HTTP 协议处理请求的服务。
+ *
+ * @since 5.0.0
+ */
 public abstract class ReceptionistService extends KeelHttpServer implements Service {
     @NotNull
     private final Application application;

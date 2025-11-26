@@ -13,6 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * 基于依次部署给定的 Verticles 运行的应用程序，默认提供了常见的服务封装。
+ * <p>
+ * 通用应用一般启动的服务依次为：<br>
+ * 1. 监控服务<br>
+ * 2. 业务初始化服务<br>
+ * 3. 队列服务<br>
+ * 4. 定时任务服务<br>
+ * 5. HTTP 服务<br>
+ * <p>
+ * 可以通过命令行参数和重载服务构建方法来自定义服务运作。
+ *
+ * @since 5.0.0
+ */
 public abstract class CommonApplication extends Application {
     public static final String optionDisableMonitor = "disableMonitor";
     public static final String optionDisableQueue = "disableQueue";

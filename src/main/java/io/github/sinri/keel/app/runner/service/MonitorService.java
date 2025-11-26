@@ -19,6 +19,13 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+/**
+ * 运行时监控服务。
+ * <p>
+ * 运行时监控服务，用于收集和报告应用程序的运行时状态。
+ *
+ * @since 5.0.0
+ */
 public abstract class MonitorService extends AbstractKeelVerticle implements Service {
     @NotNull
     private final Application application;

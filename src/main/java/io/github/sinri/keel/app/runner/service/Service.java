@@ -8,6 +8,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
+/**
+ * 在应用体系下运行的服务的通用接口。
+ *
+ * @since 5.0.0
+ */
 public interface Service extends AppRecordingMixin, KeelVerticle {
     static Service wrap(@NotNull Application application, @NotNull Supplier<Future<Void>> anything, boolean autoUndeploy) {
         return new WrappedService(application, anything, autoUndeploy);

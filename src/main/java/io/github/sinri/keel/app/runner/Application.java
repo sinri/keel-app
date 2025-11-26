@@ -11,6 +11,11 @@ import java.util.List;
 
 import static io.github.sinri.keel.base.KeelInstance.Keel;
 
+/**
+ * 基于依次部署给定的 Verticles 运行的应用程序。
+ *
+ * @since 5.0.0
+ */
 public abstract class Application extends Program {
 
     @Override
