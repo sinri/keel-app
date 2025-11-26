@@ -1,10 +1,11 @@
 package io.github.sinri.keel.app.cli;
 
 import io.github.sinri.keel.app.common.AppLifeCycleMixin;
-import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -15,13 +16,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class CommandLineExecutable implements AppLifeCycleMixin {
 
-    private CommandLineArguments arguments;
+    private final AtomicReference<CommandLineArguments> argumentsRef = new AtomicReference<>();
 
     /**
      * 构建命令行参数解析器的抽象方法。
      * 子类应实现此方法以定义可用的命令行选项和参数。
      *
-     * @return 构建的 KeelCliArgsParser 实例，如果不需要解析参数则返回null
+     * @return 构建的 {@link CommandLineArgumentsParser} 实例，如果不需要解析参数则返回null
      */
     @Nullable
     abstract protected CommandLineArgumentsParser buildCommandLineParser();
@@ -35,15 +36,14 @@ public abstract class CommandLineExecutable implements AppLifeCycleMixin {
      *
      * @param args 命令行参数数组
      */
+    @Override
     public final void launch(String[] args) {
-        JsonifiableSerializer.register();
-
         try {
             var argsParser = buildCommandLineParser();
             if (argsParser != null) {
-                this.arguments = argsParser.parse(args);
+                this.argumentsRef.set(argsParser.parse(args));
             } else {
-                this.arguments = new CommandLineArgumentsImpl();
+                this.argumentsRef.set(new CommandLineArgumentsImpl());
             }
             runWithCommandLine();
         } catch (Throwable throwable) {
@@ -54,11 +54,12 @@ public abstract class CommandLineExecutable implements AppLifeCycleMixin {
     /**
      * 获取已解析的命令行参数。
      *
-     * @return 已解析的 KeelCliArgs 对象
+     * @return 已解析的 {@link CommandLineArguments} 对象
      * @throws IllegalStateException 如果命令行参数尚未初始化
      */
     @NotNull
     public final CommandLineArguments getArguments() {
+        var arguments = argumentsRef.get();
         if (arguments == null) {
             throw new IllegalStateException("CliArgs not initialized yet!");
         }
@@ -67,10 +68,13 @@ public abstract class CommandLineExecutable implements AppLifeCycleMixin {
 
     /**
      * 处理程序执行过程中的致命错误。
-     * 默认实现会将错误信息输出到标准错误流并退出程序。
+     * <p>
+     * 默认实现会将错误信息输出到标准错误流并以返回值 1 退出程序。
+     * 可以按需重写此方法以自定义错误处理逻辑。
      *
      * @param throwable 要处理的异常
      */
+    @Override
     public void handleError(Throwable throwable) {
         StdoutLoggerFactory.getInstance().createLogger(getClass().getName())
                            .fatal(log -> log.exception(throwable).message("Program Error"));

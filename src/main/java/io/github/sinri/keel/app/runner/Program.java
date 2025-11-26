@@ -1,8 +1,8 @@
 package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineExecutable;
-import io.github.sinri.keel.app.common.AppLifeCycleMixin;
 import io.github.sinri.keel.app.common.AppRecordingMixin;
+import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.logger.Logger;
@@ -23,7 +23,7 @@ import static io.github.sinri.keel.base.KeelInstance.Keel;
  *
  * @since 5.0.0
  */
-public abstract class Program extends CommandLineExecutable implements AppLifeCycleMixin, AppRecordingMixin {
+public abstract class Program extends CommandLineExecutable implements AppRecordingMixin {
     @NotNull
     private LoggerFactory loggerFactory;
     @NotNull
@@ -47,6 +47,8 @@ public abstract class Program extends CommandLineExecutable implements AppLifeCy
     @Override
     protected final void runWithCommandLine() {
         long startTime = System.currentTimeMillis();
+
+        JsonifiableSerializer.register();
 
         try {
             loadLocalConfiguration();
