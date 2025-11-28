@@ -15,6 +15,7 @@ import static io.github.sinri.keel.base.KeelInstance.Keel;
 /**
  * 如果你使用 Vert.x Application Launcher，你可以使用这个 hooks 扩展接口来确保 {@link KeelInstance#Keel} 完成必要的初始化。
  *
+ * @see <a href="https://vertx.io/docs/vertx-launcher-application/java/">Vert.x Application Launcher</a>
  * @since 5.0.0
  */
 public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
