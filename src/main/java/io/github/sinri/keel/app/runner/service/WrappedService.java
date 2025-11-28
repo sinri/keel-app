@@ -37,11 +37,13 @@ class WrappedService extends AbstractKeelVerticle implements Service {
     }
 
     @Override
-    protected Future<Void> startVerticle() {
+    protected @NotNull Future<Void> startVerticle() {
         return anything.get()
                        .onComplete(ar -> {
                            if (autoUndeploy) {
-                               this.undeployMe();
+                               Keel.getVertx().setTimer(100, id -> {
+                                   this.undeployMe();
+                               });
                            }
                        });
     }
