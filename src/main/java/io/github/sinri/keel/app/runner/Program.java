@@ -2,6 +2,8 @@ package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineExecutable;
 import io.github.sinri.keel.app.common.AppRecordingMixin;
+import io.github.sinri.keel.base.Keel;
+import io.github.sinri.keel.base.configuration.ConfigTree;
 import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
@@ -15,24 +17,34 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Objects;
 
-import static io.github.sinri.keel.base.KeelInstance.Keel;
 
 /**
  * 本类抽象了基于 Vertx 异步框架运行的程序。
  *
  * @since 5.0.0
  */
-public abstract class Program extends CommandLineExecutable implements AppRecordingMixin {
+public abstract class Program extends CommandLineExecutable implements AppRecordingMixin, Keel {
+    @NotNull
+    private final ConfigTree configTree;
     @NotNull
     private LoggerFactory loggerFactory;
     @NotNull
     private Logger logger;
     private @Nullable MetricRecorder metricRecorder;
+    @Nullable
+    private Vertx vertx;
 
     public Program() {
+        this.configTree = new ConfigTree();
         this.loggerFactory = StdoutLoggerFactory.getInstance();
         this.resetLogger();
+    }
+
+    @Override
+    public @NotNull ConfigTree getConfiguration() {
+        return configTree;
     }
 
     @Override
@@ -64,9 +76,14 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
               .compose(v -> {
                   if (clusterManager == null) {
                       // NOT SUPPORT CLUSTER MODE
-                      return Keel.initializeVertx(vertxOptions);
+                      this.vertx = Vertx.builder().with(vertxOptions).build();
+                      return Future.succeededFuture();
                   } else {
-                      return Keel.initializeVertx(vertxOptions, clusterManager);
+                      return Vertx.builder().withClusterManager(clusterManager).with(vertxOptions).buildClustered()
+                                  .compose(built -> {
+                                      this.vertx = built;
+                                      return Future.succeededFuture();
+                                  });
                   }
               })
               .compose(initialized -> {
@@ -104,7 +121,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
     }
 
     protected void loadLocalConfiguration() throws IOException {
-        Keel.getConfiguration().loadPropertiesFile("config.properties");
+        getConfiguration().loadPropertiesFile("config.properties");
     }
 
     protected Future<Void> loadRemoteConfiguration() {
@@ -112,7 +129,9 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
     }
 
     @NotNull
-    abstract protected VertxOptions buildVertxOptions();
+    protected VertxOptions buildVertxOptions() {
+        return new VertxOptions();
+    }
 
     @Nullable
     protected ClusterManager buildClusterManager() {
@@ -125,8 +144,16 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
         return loggerFactory;
     }
 
+    @Deprecated(since = "5.0.0", forRemoval = true)
+    @Override
+    public void setLoggerFactory(@NotNull LoggerFactory loggerFactory) {
+        this.loggerFactory = loggerFactory;
+    }
+
     @NotNull
-    abstract protected LoggerFactory buildLoggerFactory();
+    protected LoggerFactory buildLoggerFactory() {
+        return StdoutLoggerFactory.getInstance();
+    }
 
     private void resetLogger() {
         this.logger = this.loggerFactory.createLogger(getClass().getName());
@@ -137,6 +164,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
         return logger;
     }
 
+    @NotNull
     abstract protected Future<Void> launchAsProgram();
 
     /**
@@ -160,7 +188,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
         // do nothing by default, or you may need a latch to keep the main process alive.
     }
 
-    public final Vertx getVertx() {
-        return Keel.getVertx();
+    public final @NotNull Vertx getVertx() {
+        return Objects.requireNonNull(vertx);
     }
 }

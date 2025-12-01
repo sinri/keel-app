@@ -16,6 +16,7 @@ public abstract class ReceptionistService extends KeelHttpServer implements Serv
     private final Application application;
 
     public ReceptionistService(@NotNull Application application) {
+        super(application);
         this.application = application;
     }
 

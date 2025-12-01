@@ -21,6 +21,7 @@ class WrappedService extends AbstractKeelVerticle implements Service {
     private final boolean autoUndeploy;
 
     public WrappedService(@NotNull Application application, @NotNull Supplier<Future<Void>> anything, boolean autoUndeploy) {
+        super(application);
         this.application = application;
         this.anything = anything;
         this.autoUndeploy = autoUndeploy;
@@ -41,7 +42,7 @@ class WrappedService extends AbstractKeelVerticle implements Service {
         return anything.get()
                        .onComplete(ar -> {
                            if (autoUndeploy) {
-                               Keel.getVertx().setTimer(100, id -> {
+                               getVertx().setTimer(100, id -> {
                                    this.undeployMe();
                                });
                            }

@@ -1,19 +1,19 @@
 package io.github.sinri.keel.app.launcher;
 
-import io.github.sinri.keel.base.KeelInstance;
+import io.github.sinri.keel.base.Keel;
 import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.vertx.core.json.JsonObject;
 import io.vertx.launcher.application.HookContext;
+import io.vertx.launcher.application.VertxApplication;
 import io.vertx.launcher.application.VertxApplicationHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.sinri.keel.base.KeelInstance.Keel;
 
 /**
- * 如果你使用 Vert.x Application Launcher，你可以使用这个 hooks 扩展接口来确保 {@link KeelInstance#Keel} 完成必要的初始化。
+ * 如果你使用 Vert.x Application Launcher，你可以使用这个 hooks 扩展接口来基于 vertx 和配置构建 {@link Keel} 实例。
  *
  * @see <a href="https://vertx.io/docs/vertx-launcher-application/java/">Vert.x Application Launcher</a>
  * @since 5.0.0
@@ -57,15 +57,21 @@ public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
         });
     }
 
+    @NotNull
+    Keel getKeel();
+
+    /**
+     * 以给定的参数中可以获取到的 vertx 构建一个 Keel 实例。
+     *
+     * @param context exposes objects available at this stage of the {@link VertxApplication} launch process
+     */
     @Override
-    default void afterVertxStarted(HookContext context) {
-        Keel.initializeVertx(context.vertx());
-    }
+    void afterVertxStarted(HookContext context);
 
     @Override
     default JsonObject afterConfigParsed(JsonObject config) {
         var configElements = transformJsonObjectToConfigElements(config);
-        configElements.forEach(configElement -> Keel.getConfiguration().addChild(configElement));
+        configElements.forEach(configElement -> getKeel().getConfiguration().addChild(configElement));
         return VertxApplicationHooks.super.afterConfigParsed(config);
     }
 }

@@ -23,13 +23,15 @@ public abstract class SundialService extends KeelSundial implements Service {
     private final Application application;
 
     public SundialService(@NotNull Application application) {
+        super(application);
         this.application = application;
     }
 
+    @NotNull
     public static SundialService wrap(@NotNull Application application, @NotNull Supplier<Future<Collection<KeelSundialPlan>>> plansFetcher) {
         return new SundialService(application) {
             @Override
-            protected Future<Collection<KeelSundialPlan>> fetchPlans() {
+            protected @NotNull Future<Collection<KeelSundialPlan>> fetchPlans() {
                 return plansFetcher.get();
             }
         };

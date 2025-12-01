@@ -31,6 +31,7 @@ public abstract class MonitorService extends AbstractKeelVerticle implements Ser
     private final Application application;
 
     public MonitorService(@NotNull Application application) {
+        super(application);
         this.application = application;
     }
 
@@ -90,8 +91,8 @@ public abstract class MonitorService extends AbstractKeelVerticle implements Ser
     }
 
     @Override
-    protected Future<Void> startVerticle() {
-        new KeelRuntimeMonitor().startRuntimeMonitor(getInterval(), this::handleMonitorSnapshot);
+    protected @NotNull Future<Void> startVerticle() {
+        new KeelRuntimeMonitor(getVertx()).startRuntimeMonitor(getInterval(), this::handleMonitorSnapshot);
         return Future.succeededFuture();
     }
 

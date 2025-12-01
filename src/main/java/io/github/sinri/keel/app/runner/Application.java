@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static io.github.sinri.keel.base.KeelInstance.Keel;
 
 /**
  * 基于依次部署给定的 Verticles 运行的应用程序。
@@ -52,9 +51,9 @@ public abstract class Application extends Program {
     }
 
     @Override
-    protected final Future<Void> launchAsProgram() {
+    protected final @NotNull Future<Void> launchAsProgram() {
         List<Service> services = buildServices();
-        return Keel.asyncCallIteratively(
+        return asyncCallIteratively(
                            services,
                            service -> service.deployMe()
                                              .compose(deploymentID -> {

@@ -15,6 +15,7 @@ public abstract class QueueService extends KeelQueue implements Service {
     private final Application application;
 
     public QueueService(@NotNull Application application) {
+        super(application);
         this.application = application;
     }
 
