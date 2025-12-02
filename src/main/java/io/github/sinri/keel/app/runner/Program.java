@@ -144,12 +144,6 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
         return loggerFactory;
     }
 
-    @Deprecated(since = "5.0.0", forRemoval = true)
-    @Override
-    public void setLoggerFactory(@NotNull LoggerFactory loggerFactory) {
-        this.loggerFactory = loggerFactory;
-    }
-
     @NotNull
     protected LoggerFactory buildLoggerFactory() {
         return StdoutLoggerFactory.getInstance();

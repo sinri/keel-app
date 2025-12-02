@@ -2,10 +2,7 @@ package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineOption;
 import io.github.sinri.keel.app.runner.service.*;
-import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
-import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.vertx.core.Future;
-import io.vertx.core.VertxOptions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -153,13 +150,4 @@ public abstract class CommonApplication extends Application {
         return receptionistService;
     }
 
-    @Override
-    protected @NotNull VertxOptions buildVertxOptions() {
-        return new VertxOptions();
-    }
-
-    @Override
-    protected @NotNull LoggerFactory buildLoggerFactory() {
-        return StdoutLoggerFactory.getInstance();
-    }
 }
