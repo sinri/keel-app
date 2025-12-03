@@ -6,8 +6,8 @@
 
     <groupId>io.github.sinri</groupId>
     <artifactId>keel-app</artifactId>
-    <!--            <version>5.0.0-SNAPSHOT</version>-->
-    <version>5.0.0-rc.5</version>
+    <version>5.0.0-SNAPSHOT</version>
+    <!--    <version>5.0.0-rc.5</version>-->
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -25,7 +25,7 @@
         <keelWebVersion>5.0.0-rc.10</keelWebVersion>
         <keelMySQLVersion>5.0.0-rc.9</keelMySQLVersion>
         <keelAliyunVersion>5.0.0-rc.12</keelAliyunVersion>
-        <keelLoggerExtVersion>5.0.0-rc.9</keelLoggerExtVersion>
+        <keelLoggerExtVersion>5.0.0-rc.10</keelLoggerExtVersion>
     </properties>
 
     <name>Keel-App</name>
