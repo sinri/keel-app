@@ -2,7 +2,6 @@ package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineOption;
 import io.github.sinri.keel.app.runner.service.*;
-import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,8 +97,6 @@ public abstract class CommonApplication extends Application {
             }
         }
 
-        services.add(Service.wrap(this, this::prepare));
-
         if (!isQueueDisabled()) {
             queueService = constructQueueService();
             if (queueService != null) {
@@ -125,8 +122,6 @@ public abstract class CommonApplication extends Application {
     }
 
     abstract protected @Nullable MonitorService constructMonitorService();
-
-    abstract protected @NotNull Future<Void> prepare();
 
     abstract protected @Nullable QueueService constructQueueService();
 

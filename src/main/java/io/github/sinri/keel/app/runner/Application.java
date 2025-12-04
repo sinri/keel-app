@@ -52,24 +52,29 @@ public abstract class Application extends Program {
 
     @Override
     protected final @NotNull Future<Void> launchAsProgram() {
-        List<Service> services = buildServices();
-        return asyncCallIteratively(
-                           services,
-                           service -> service.deployMe()
-                                             .compose(deploymentID -> {
-                                                 getLogger().info("Deployed verticle %s with deploymentID %s".formatted(
-                                                         service.getClass().getName(), deploymentID
-                                                 ));
-                                                 return Future.succeededFuture();
-                                             })
-                   )
-                   .compose(v -> {
-                       getLogger().info("All services deployed");
-                       return Future.succeededFuture();
-                   });
+        return prepare()
+                .compose(prepared -> {
+                    List<Service> services = buildServices();
+                    return asyncCallIteratively(
+                            services,
+                            service -> service.deployMe()
+                                              .compose(deploymentID -> {
+                                                  getLogger().info("Deployed verticle %s with deploymentID %s".formatted(
+                                                          service.getClass().getName(), deploymentID
+                                                  ));
+                                                  return Future.succeededFuture();
+                                              })
+                    )
+                            .compose(v -> {
+                                getLogger().info("All services deployed");
+                                return Future.succeededFuture();
+                            });
+                });
     }
 
     @NotNull
     abstract protected List<Service> buildServices();
 
+    @NotNull
+    abstract protected Future<Void> prepare();
 }
