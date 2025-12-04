@@ -1,7 +1,7 @@
 package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.Application;
-import io.github.sinri.keel.core.servant.queue.KeelQueue;
+import io.github.sinri.keel.core.servant.queue.QueueDispatcher;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,11 +10,11 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 5.0.0
  */
-public abstract class QueueService extends KeelQueue implements Service {
+public abstract class AbstractQueueService extends QueueDispatcher implements Service {
     @NotNull
     private final Application application;
 
-    public QueueService(@NotNull Application application) {
+    public AbstractQueueService(@NotNull Application application) {
         super(application);
         this.application = application;
     }

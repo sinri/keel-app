@@ -16,7 +16,7 @@ import java.util.function.Function;
  *
  * @since 5.0.0
  */
-class MonitorServiceMetricImpl extends MonitorService {
+class MonitorServiceMetricImpl extends AbstractMonitorService {
     public static final String METRIC_SURVIVED = "survived";
     public static final String METRIC_MINOR_GC_COUNT = "minor_gc_count";
     public static final String METRIC_MINOR_GC_TIME = "minor_gc_time";

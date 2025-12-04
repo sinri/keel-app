@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
  *
  * @since 5.0.0
  */
-class MonitorServiceLoggerImpl extends MonitorService {
+class MonitorServiceLoggerImpl extends AbstractMonitorService {
     private final long startTimestamp;
     private final @Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier;
     private final @NotNull SpecificLogger<MonitorLog> logger;

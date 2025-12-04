@@ -30,10 +30,10 @@ public abstract class CommonApplication extends Application {
     public static final String optionDisableReceptionist = "disableReceptionist";
     public static final String optionReceptionistPort = "receptionistPort";
 
-    private MonitorService monitorService;
-    private QueueService queueService;
-    private SundialService sundialService;
-    private ReceptionistService receptionistService;
+    private AbstractMonitorService monitorService;
+    private AbstractQueueService queueService;
+    private AbstractSundialService sundialService;
+    private AbstractReceptionistService receptionistService;
 
     @Nullable
     @Override
@@ -121,27 +121,27 @@ public abstract class CommonApplication extends Application {
         return services;
     }
 
-    abstract protected @Nullable MonitorService constructMonitorService();
+    abstract protected @Nullable AbstractMonitorService constructMonitorService();
 
-    abstract protected @Nullable QueueService constructQueueService();
+    abstract protected @Nullable AbstractQueueService constructQueueService();
 
-    abstract protected @Nullable SundialService constructSundialService();
+    abstract protected @Nullable AbstractSundialService constructSundialService();
 
-    abstract protected @Nullable ReceptionistService constructReceptionistService();
+    abstract protected @Nullable AbstractReceptionistService constructReceptionistService();
 
-    public MonitorService getMonitorService() {
+    public AbstractMonitorService getMonitorService() {
         return monitorService;
     }
 
-    public QueueService getQueueService() {
+    public AbstractQueueService getQueueService() {
         return queueService;
     }
 
-    public SundialService getSundialService() {
+    public AbstractSundialService getSundialService() {
         return sundialService;
     }
 
-    public ReceptionistService getReceptionistService() {
+    public AbstractReceptionistService getReceptionistService() {
         return receptionistService;
     }
 

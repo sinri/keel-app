@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 
 /**
  * 通过一个异步逻辑快速构建的服务。
+ * <p>
+ * 不要通过这个类来启动需要长期驻留的实例，要考虑 verticle 解除部署时会清退内部实例的设定。
  *
  * @since 5.0.0
  */

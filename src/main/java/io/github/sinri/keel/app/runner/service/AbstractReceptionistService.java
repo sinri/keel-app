@@ -11,11 +11,11 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 5.0.0
  */
-public abstract class ReceptionistService extends KeelHttpServer implements Service {
+public abstract class AbstractReceptionistService extends KeelHttpServer implements Service {
     @NotNull
     private final Application application;
 
-    public ReceptionistService(@NotNull Application application) {
+    public AbstractReceptionistService(@NotNull Application application) {
         super(application);
         this.application = application;
     }

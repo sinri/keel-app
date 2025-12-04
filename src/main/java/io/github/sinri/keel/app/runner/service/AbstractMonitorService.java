@@ -26,20 +26,20 @@ import java.util.function.Function;
  *
  * @since 5.0.0
  */
-public abstract class MonitorService extends AbstractKeelVerticle implements Service {
+public abstract class AbstractMonitorService extends AbstractKeelVerticle implements Service {
     @NotNull
     private final Application application;
 
-    public MonitorService(@NotNull Application application) {
+    public AbstractMonitorService(@NotNull Application application) {
         super(application);
         this.application = application;
     }
 
-    public static MonitorService throughLogger(@NotNull Application application, @Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier) {
+    public static AbstractMonitorService throughLogger(@NotNull Application application, @Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier) {
         return new MonitorServiceLoggerImpl(application, specialSnapshotModifier);
     }
 
-    public static MonitorService throughMetricRecorder(@NotNull Application application, @Nullable Function<MonitorSnapshot, List<MetricRecord>> specialSnapshotModifier) {
+    public static AbstractMonitorService throughMetricRecorder(@NotNull Application application, @Nullable Function<MonitorSnapshot, List<MetricRecord>> specialSnapshotModifier) {
         return new MonitorServiceMetricImpl(application, specialSnapshotModifier);
     }
 
