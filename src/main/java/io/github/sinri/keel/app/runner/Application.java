@@ -57,13 +57,21 @@ public abstract class Application extends Program {
                     List<Service> services = buildServices();
                     return asyncCallIteratively(
                             services,
-                            service -> service.deployMe()
+                            service -> {
+                                getLogger().info("For service %s".formatted(service.getClass().getName()));
+                                return service.deployMe()
                                               .compose(deploymentID -> {
                                                   getLogger().info("Deployed verticle %s with deploymentID %s".formatted(
                                                           service.getClass().getName(), deploymentID
                                                   ));
                                                   return Future.succeededFuture();
-                                              })
+                                              }, throwable -> {
+                                                  getLogger().error(x -> x.exception(throwable)
+                                                                          .message("Failed to deploy verticle %s".formatted(service.getClass()
+                                                                                                                                   .getName())));
+                                                  return Future.succeededFuture();
+                                              });
+                            }
                     )
                             .compose(v -> {
                                 getLogger().info("All services deployed");

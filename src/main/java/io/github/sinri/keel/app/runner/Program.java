@@ -94,19 +94,26 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                   this.getLogger().info("REMOTE CONFIG LOADED (if any)");
 
                   // customized logging
-                  var builtLoggerFactory = buildLoggerFactory();
-                  if (builtLoggerFactory != loggerFactory) {
-                      loggerFactory = builtLoggerFactory;
-                      this.resetLogger();
-                      getLogger().info("CUSTOM LOGGER FACTORY CENTER LOADED");
-                  }
-
+                  return buildLoggerFactory()
+                          .compose(builtLoggerFactory -> {
+                              if (builtLoggerFactory != loggerFactory) {
+                                  loggerFactory = builtLoggerFactory;
+                                  this.resetLogger();
+                                  getLogger().info("CUSTOM LOGGER FACTORY CENTER LOADED");
+                              }
+                              return Future.succeededFuture();
+                          });
+              })
+              .compose(v -> {
                   // metric recording
-                  this.metricRecorder = buildMetricRecorder();
-                  if (this.metricRecorder != null) {
-                      getLogger().info("CUSTOM METRIC RECORDER LOADED");
-                  }
-                  return Future.succeededFuture();
+                  return buildMetricRecorder()
+                          .compose(builtMetricRecorder -> {
+                              if (builtMetricRecorder != null) {
+                                  this.metricRecorder = builtMetricRecorder;
+                                  getLogger().info("CUSTOM METRIC RECORDER LOADED");
+                              }
+                              return Future.succeededFuture();
+                          });
               })
               .compose(v -> {
                   return launchAsProgram();
@@ -145,8 +152,8 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
     }
 
     @NotNull
-    protected LoggerFactory buildLoggerFactory() {
-        return StdoutLoggerFactory.getInstance();
+    protected Future<LoggerFactory> buildLoggerFactory() {
+        return Future.succeededFuture(StdoutLoggerFactory.getInstance());
     }
 
     private void resetLogger() {
@@ -168,9 +175,9 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
      *
      * @return 一个可用的定量指标记录器，或 null。
      */
-    @Nullable
-    protected MetricRecorder buildMetricRecorder() {
-        return null;
+    @NotNull
+    protected Future<MetricRecorder> buildMetricRecorder() {
+        return Future.succeededFuture(null);
     }
 
     protected void whenLaunched(long startTime) {
