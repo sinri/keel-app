@@ -3,7 +3,7 @@ package io.github.sinri.keel.app.runner;
 import io.github.sinri.keel.app.cli.CommandLineExecutable;
 import io.github.sinri.keel.app.common.AppRecordingMixin;
 import io.github.sinri.keel.base.Keel;
-import io.github.sinri.keel.base.configuration.ConfigTree;
+import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 public abstract class Program extends CommandLineExecutable implements AppRecordingMixin, Keel {
     @NotNull
-    private final ConfigTree configTree;
+    private final ConfigElement configTree;
     @NotNull
     private LoggerFactory loggerFactory;
     @NotNull
@@ -37,13 +37,13 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
     private Vertx vertx;
 
     public Program() {
-        this.configTree = new ConfigTree();
+        this.configTree = new ConfigElement("");
         this.loggerFactory = StdoutLoggerFactory.getInstance();
         this.resetLogger();
     }
 
     @Override
-    public @NotNull ConfigTree getConfiguration() {
+    public @NotNull ConfigElement getConfiguration() {
         return configTree;
     }
 

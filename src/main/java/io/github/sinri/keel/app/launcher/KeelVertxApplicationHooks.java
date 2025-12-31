@@ -32,7 +32,7 @@ public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
             } catch (Throwable throwable) {
                 Object value = entry.getValue();
                 if (value != null) {
-                    child.setValue(value.toString());
+                    child.setElementValue(value.toString());
                 }
             }
             list.add(child);
@@ -51,7 +51,7 @@ public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
             } catch (Throwable throwable) {
                 Object value = entry.getValue();
                 if (value != null) {
-                    child.setValue(value.toString());
+                    child.setElementValue(value.toString());
                 }
             }
         });
