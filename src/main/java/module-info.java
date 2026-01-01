@@ -3,8 +3,15 @@ module keel.app.main {
     requires transitive io.github.sinri.keel.core;
     requires transitive io.github.sinri.keel.logger.api;
     requires transitive io.github.sinri.keel.web;
+
     requires transitive io.vertx.core;
     requires transitive io.vertx.launcher.application;
+    requires transitive io.vertx.auth.common;
+    requires transitive io.vertx.web;
+    requires transitive io.vertx.web.client;
+    requires transitive io.vertx.sql.client;
+    requires transitive io.vertx.sql.client.mysql;
+
     requires static org.jetbrains.annotations;
 
     exports io.github.sinri.keel.app.cli;
