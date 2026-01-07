@@ -2,8 +2,9 @@ package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineOption;
 import io.github.sinri.keel.app.runner.service.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import io.github.sinri.keel.logger.api.LateObject;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
  *
  * @since 5.0.0
  */
+@NullMarked
 public abstract class CommonApplication extends Application {
     public static final String optionDisableMonitor = "disableMonitor";
     public static final String optionDisableQueue = "disableQueue";
@@ -30,14 +32,13 @@ public abstract class CommonApplication extends Application {
     public static final String optionDisableReceptionist = "disableReceptionist";
     public static final String optionReceptionistPort = "receptionistPort";
 
-    private AbstractMonitorService monitorService;
-    private AbstractQueueService queueService;
-    private AbstractSundialService sundialService;
-    private AbstractReceptionistService receptionistService;
+    private final LateObject<AbstractMonitorService> lateMonitorService = new LateObject<>();
+    private final LateObject<AbstractQueueService> lateQueueService = new LateObject<>();
+    private final LateObject<AbstractSundialService> lateSundialService = new LateObject<>();
+    private final LateObject<AbstractReceptionistService> lateReceptionistService = new LateObject<>();
 
-    @Nullable
     @Override
-    protected List<CommandLineOption> buildCliOptions() {
+    protected @Nullable List<CommandLineOption> buildCliOptions() {
         return List.of(
                 new CommandLineOption()
                         .alias(optionDisableQueue)
@@ -87,33 +88,37 @@ public abstract class CommonApplication extends Application {
     }
 
     @Override
-    protected @NotNull List<Service> buildServices() {
+    protected List<Service> buildServices() {
         List<Service> services = new ArrayList<>();
 
         if (!isMonitorDisabled()) {
-            monitorService = constructMonitorService();
+            AbstractMonitorService monitorService = constructMonitorService();
             if (monitorService != null) {
+                lateMonitorService.set(monitorService);
                 services.add(monitorService);
             }
         }
 
         if (!isQueueDisabled()) {
-            queueService = constructQueueService();
+            AbstractQueueService queueService = constructQueueService();
             if (queueService != null) {
+                lateQueueService.set(queueService);
                 services.add(queueService);
             }
         }
 
         if (!isSundialDisabled()) {
-            sundialService = constructSundialService();
+            AbstractSundialService sundialService = constructSundialService();
             if (sundialService != null) {
+                lateSundialService.set(sundialService);
                 services.add(sundialService);
             }
         }
 
         if (!isReceptionistDisabled()) {
-            receptionistService = constructReceptionistService();
+            AbstractReceptionistService receptionistService = constructReceptionistService();
             if (receptionistService != null) {
+                lateReceptionistService.set(receptionistService);
                 services.add(receptionistService);
             }
         }
@@ -130,19 +135,19 @@ public abstract class CommonApplication extends Application {
     abstract protected @Nullable AbstractReceptionistService constructReceptionistService();
 
     public AbstractMonitorService getMonitorService() {
-        return monitorService;
+        return lateMonitorService.get();
     }
 
     public AbstractQueueService getQueueService() {
-        return queueService;
+        return lateQueueService.get();
     }
 
     public AbstractSundialService getSundialService() {
-        return sundialService;
+        return lateSundialService.get();
     }
 
     public AbstractReceptionistService getReceptionistService() {
-        return receptionistService;
+        return lateReceptionistService.get();
     }
 
 }

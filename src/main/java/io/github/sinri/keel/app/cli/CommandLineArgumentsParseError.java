@@ -1,6 +1,8 @@
 package io.github.sinri.keel.app.cli;
 
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * 在解析命令行参数期间发生的错误的异常。
  * <p>
@@ -8,6 +10,7 @@ package io.github.sinri.keel.app.cli;
  *
  * @since 5.0.0
  */
+@NullMarked
 public class CommandLineArgumentsParseError extends Exception {
     public CommandLineArgumentsParseError(String message) {
         super(message);

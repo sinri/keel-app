@@ -1,7 +1,8 @@
 package io.github.sinri.keel.app.cli;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -11,6 +12,7 @@ import java.util.*;
  *
  * @since 5.0.0
  */
+@NullMarked
 class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgumentsWriter {
     /**
      * 将选项ID映射到选项对象的映射表。
@@ -23,7 +25,7 @@ class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgum
     /**
      * 将选项ID映射到选项值的映射表（如果选项是标志，则值为null）。
      */
-    private final Map<String, String> idToOptionValueMap = new HashMap<>();
+    private final Map<String, @Nullable String> idToOptionValueMap = new HashMap<>();
     /**
      * 位置参数列表。
      */
@@ -32,11 +34,11 @@ class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgum
     public CommandLineArgumentsImpl() {
     }
 
-    public void recordOption(@NotNull CommandLineOption option, @Nullable String value) {
+    public void recordOption(CommandLineOption option, @Nullable String value) {
         idToOptionMap.put(option.id(), option);
         Set<String> aliasSet = option.getAliasSet();
         for (var alias : aliasSet) {
-            if (alias == null || alias.isEmpty()) continue;
+            if (alias.isEmpty()) continue;
             nameToOptionIdMap.put(alias, option.id());
         }
         idToOptionValueMap.put(option.id(), value);
@@ -44,7 +46,7 @@ class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgum
 
     @Nullable
     @Override
-    public String readOption(@NotNull String longName) {
+    public String readOption(String longName) {
         String optionId = nameToOptionIdMap.get(longName);
         if (optionId == null) return null;
         CommandLineOption option = idToOptionMap.get(optionId);
@@ -54,7 +56,7 @@ class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgum
     }
 
     @Override
-    public boolean readFlag(@NotNull String longName) {
+    public boolean readFlag(String longName) {
         return readOption(longName) != null;
     }
 
@@ -68,7 +70,7 @@ class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgum
     }
 
     @Override
-    public void recordParameter(@NotNull String parameter) {
+    public void recordParameter(String parameter) {
         parameters.add(parameter);
     }
 

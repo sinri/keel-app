@@ -1,7 +1,7 @@
 package io.github.sinri.keel.app.cli;
 
 import io.vertx.core.Handler;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * 支持解析类似以下的命令行参数：
@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 5.0.0
  */
+@NullMarked
 public interface CommandLineArgumentsParser {
     static CommandLineArgumentsParser create() {
         return new CommandLineArgumentsParserImpl();
@@ -32,12 +33,12 @@ public interface CommandLineArgumentsParser {
      * @return 表示解析后的命令行选项、标志和参数的结果对象
      * @throws CommandLineArgumentsParseError 如果解析失败
      */
-    @NotNull
+
     CommandLineArguments parse(String[] args) throws CommandLineArgumentsParseError;
 
-    void addOption(@NotNull CommandLineOption option) throws CommandLineArgumentsDefinitionError;
+    void addOption(CommandLineOption option) throws CommandLineArgumentsDefinitionError;
 
-    default void addOption(@NotNull Handler<CommandLineOption> optionHandler) throws CommandLineArgumentsDefinitionError {
+    default void addOption(Handler<CommandLineOption> optionHandler) throws CommandLineArgumentsDefinitionError {
         CommandLineOption option = new CommandLineOption();
         optionHandler.handle(option);
         addOption(option);

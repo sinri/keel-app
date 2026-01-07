@@ -3,9 +3,9 @@ package io.github.sinri.keel.app.runner;
 import io.github.sinri.keel.app.cli.CommandLineExecutable;
 import io.github.sinri.keel.app.common.AppRecordingMixin;
 import io.github.sinri.keel.base.Keel;
-import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
+import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.logger.api.metric.MetricRecorder;
@@ -13,11 +13,10 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Objects;
 
 
 /**
@@ -25,26 +24,29 @@ import java.util.Objects;
  *
  * @since 5.0.0
  */
+@NullMarked
 public abstract class Program extends CommandLineExecutable implements AppRecordingMixin, Keel {
-    @NotNull
-    private final ConfigElement configTree;
-    @NotNull
-    private LoggerFactory loggerFactory;
-    @NotNull
+
+    // private final ConfigElement rootConfigElement;
+    private final LateObject<Vertx> lateVertx = new LateObject<>();
+    // private LoggerFactory loggerFactory;
     private Logger logger;
     private @Nullable MetricRecorder metricRecorder;
-    @Nullable
-    private Vertx vertx;
 
     public Program() {
-        this.configTree = new ConfigElement("");
-        this.loggerFactory = StdoutLoggerFactory.getInstance();
+        // this.rootConfigElement = new ConfigElement("");
+        // this.loggerFactory = StdoutLoggerFactory.getInstance();
         this.resetLogger();
     }
 
+    //    @Override
+    //    public ConfigElement getConfiguration() {
+    //        return rootConfigElement;
+    //    }
+
     @Override
-    public @NotNull ConfigElement getConfiguration() {
-        return configTree;
+    public @Nullable MetricRecorder getMetricRecorder() {
+        return metricRecorder;
     }
 
     @Override
@@ -76,12 +78,13 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
               .compose(v -> {
                   if (clusterManager == null) {
                       // NOT SUPPORT CLUSTER MODE
-                      this.vertx = Vertx.builder().with(vertxOptions).build();
+                      Vertx tempVertx = Vertx.builder().with(vertxOptions).build();
+                      lateVertx.set(tempVertx);
                       return Future.succeededFuture();
                   } else {
                       return Vertx.builder().withClusterManager(clusterManager).with(vertxOptions).buildClustered()
                                   .compose(built -> {
-                                      this.vertx = built;
+                                      this.lateVertx.set(built);
                                       return Future.succeededFuture();
                                   });
                   }
@@ -96,8 +99,9 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                   // customized logging
                   return buildLoggerFactory()
                           .compose(builtLoggerFactory -> {
-                              if (builtLoggerFactory != loggerFactory) {
-                                  loggerFactory = builtLoggerFactory;
+                              if (builtLoggerFactory != SHARED_LOGGER_FACTORY_REF.get()) {
+                                  //loggerFactory = builtLoggerFactory;
+                                  SHARED_LOGGER_FACTORY_REF.set(builtLoggerFactory);
                                   this.resetLogger();
                                   getLogger().info("CUSTOM LOGGER FACTORY CENTER LOADED");
                               }
@@ -135,7 +139,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
         return Future.succeededFuture();
     }
 
-    @NotNull
+
     protected VertxOptions buildVertxOptions() {
         return new VertxOptions();
     }
@@ -146,26 +150,25 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
     }
 
     @Override
-    @NotNull
     public final LoggerFactory getLoggerFactory() {
-        return loggerFactory;
+        // return loggerFactory;
+        return Keel.super.getLoggerFactory();
     }
 
-    @NotNull
     protected Future<LoggerFactory> buildLoggerFactory() {
         return Future.succeededFuture(StdoutLoggerFactory.getInstance());
     }
 
     private void resetLogger() {
-        this.logger = this.loggerFactory.createLogger(getClass().getName());
+        this.logger = this.getLoggerFactory().createLogger(getClass().getName());
     }
 
-    @NotNull
+
     public final Logger getLogger() {
         return logger;
     }
 
-    @NotNull
+
     abstract protected Future<Void> launchAsProgram();
 
     /**
@@ -175,8 +178,8 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
      *
      * @return 一个可用的定量指标记录器，或 null。
      */
-    @NotNull
-    protected Future<MetricRecorder> buildMetricRecorder() {
+
+    protected Future<@Nullable MetricRecorder> buildMetricRecorder() {
         return Future.succeededFuture(null);
     }
 
@@ -189,7 +192,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
         // do nothing by default, or you may need a latch to keep the main process alive.
     }
 
-    public final @NotNull Vertx getVertx() {
-        return Objects.requireNonNull(vertx);
+    public final Vertx getVertx() {
+        return lateVertx.get();
     }
 }

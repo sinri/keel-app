@@ -1,6 +1,8 @@
 package io.github.sinri.keel.app.cli;
 
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * 在解析命令行之前进行参数定义的过程里可能出现的异常。
  * <p>
@@ -8,6 +10,7 @@ package io.github.sinri.keel.app.cli;
  *
  * @since 5.0.0
  */
+@NullMarked
 public class CommandLineArgumentsDefinitionError extends RuntimeException {
     public CommandLineArgumentsDefinitionError(String msg) {
         super(msg);

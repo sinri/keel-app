@@ -1,12 +1,14 @@
 package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.Application;
-import io.github.sinri.keel.base.verticles.AbstractKeelVerticle;
+import io.github.sinri.keel.base.verticles.KeelVerticleBase;
+import io.github.sinri.keel.logger.api.LateObject;
+import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * 通过一个异步逻辑快速构建的服务。
@@ -15,39 +17,40 @@ import java.util.function.Supplier;
  *
  * @since 5.0.0
  */
-class WrappedService extends AbstractKeelVerticle implements Service {
-    @NotNull
-    private final Application application;
-    @NotNull
-    private final Supplier<Future<Void>> anything;
-    private final boolean autoUndeploy;
+@NullMarked
+class WrappedService extends KeelVerticleBase implements Service {
+    private final LateObject<Application> lateApplication = new LateObject<>();
 
-    public WrappedService(@NotNull Application application, @NotNull Supplier<Future<Void>> anything, boolean autoUndeploy) {
-        super(application);
-        this.application = application;
+    private final Function<Service, Future<Void>> anything;
+
+    public WrappedService(Function<Service, Future<Void>> anything) {
+        super();
         this.anything = anything;
-        this.autoUndeploy = autoUndeploy;
     }
 
     @Override
-    public @NotNull Application getApplication() {
-        return application;
+    public Application getApplication() {
+        return lateApplication.get();
     }
 
     @Override
-    public Future<String> deployMe() {
-        return this.deployMe(new DeploymentOptions());
-    }
-
-    @Override
-    protected @NotNull Future<Void> startVerticle() {
-        return anything.get()
+    protected Future<Void> startVerticle() {
+        return anything.apply(this)
                        .onComplete(ar -> {
-                           if (autoUndeploy) {
-                               getVertx().setTimer(100, id -> {
-                                   this.undeployMe();
-                               });
-                           }
+                           getVertx().setTimer(100, id -> {
+                               this.undeployMe();
+                           });
                        });
+    }
+
+    @Override
+    public LoggerFactory getLoggerFactory() {
+        return getApplication().getLoggerFactory();
+    }
+
+    @Override
+    public final Future<String> deployMe(Application application) {
+        lateApplication.set(application);
+        return deployMe(application.getVertx(), new DeploymentOptions());
     }
 }

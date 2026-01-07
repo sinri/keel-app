@@ -3,9 +3,11 @@ package io.github.sinri.keel.app.runner.service;
 import io.github.sinri.keel.app.runner.Application;
 import io.github.sinri.keel.core.servant.sundial.Sundial;
 import io.github.sinri.keel.core.servant.sundial.SundialPlan;
+import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.vertx.core.Future;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -17,35 +19,38 @@ import java.util.function.Supplier;
  *
  * @since 5.0.0
  */
+@NullMarked
 public abstract class AbstractSundialService extends Sundial implements Service {
 
-    @NotNull
-    private final Application application;
+    private final LateObject<Application> lateApplication = new LateObject<>();
 
-    public AbstractSundialService(@NotNull Application application) {
-        super(application);
-        this.application = application;
+    public AbstractSundialService() {
+        super();
     }
 
-    @NotNull
-    public static AbstractSundialService wrap(@NotNull Application application, @NotNull Supplier<Future<Collection<SundialPlan>>> plansFetcher) {
-        return new AbstractSundialService(application) {
+    public static AbstractSundialService wrap(Supplier<Future<@Nullable Collection<SundialPlan>>> plansFetcher) {
+        return new AbstractSundialService() {
             @Override
-            protected @NotNull Future<Collection<SundialPlan>> fetchPlans() {
+            protected Future<@Nullable Collection<SundialPlan>> fetchPlans() {
                 return plansFetcher.get();
             }
         };
     }
 
     @Override
-    public @NotNull
+    public
     final Application getApplication() {
-        return application;
+        return lateApplication.get();
     }
 
     @Override
-    public @NotNull
-    final LoggerFactory getLoggerFactory() {
-        return application.getLoggerFactory();
+    public final LoggerFactory getLoggerFactory() {
+        return getApplication().getLoggerFactory();
+    }
+
+    @Override
+    public Future<String> deployMe(Application application) {
+        lateApplication.set(application);
+        return super.deployMe(application.getVertx());
     }
 }

@@ -4,8 +4,8 @@ import io.github.sinri.keel.app.cli.CommandLineArgumentsParser;
 import io.github.sinri.keel.app.cli.CommandLineOption;
 import io.github.sinri.keel.app.runner.service.Service;
 import io.vertx.core.Future;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -15,6 +15,7 @@ import java.util.List;
  *
  * @since 5.0.0
  */
+@NullMarked
 public abstract class Application extends Program {
 
     @Override
@@ -29,18 +30,12 @@ public abstract class Application extends Program {
         return commandLineArgumentsParser;
     }
 
-
-    @Nullable
-    protected List<CommandLineOption> buildCliOptions() {
+    protected @Nullable List<CommandLineOption> buildCliOptions() {
         return null;
     }
 
-
-    @NotNull
     protected abstract String buildCliName();
 
-
-    @NotNull
     protected abstract String buildCliDescription();
 
     @Override
@@ -51,7 +46,7 @@ public abstract class Application extends Program {
     }
 
     @Override
-    protected final @NotNull Future<Void> launchAsProgram() {
+    protected final Future<Void> launchAsProgram() {
         return prepare()
                 .compose(prepared -> {
                     List<Service> services = buildServices();
@@ -59,7 +54,7 @@ public abstract class Application extends Program {
                             services,
                             service -> {
                                 getLogger().info("For service %s".formatted(service.getClass().getName()));
-                                return service.deployMe()
+                                return service.deployMe(this)
                                               .compose(deploymentID -> {
                                                   getLogger().info("Deployed verticle %s with deploymentID %s".formatted(
                                                           service.getClass().getName(), deploymentID
@@ -80,9 +75,9 @@ public abstract class Application extends Program {
                 });
     }
 
-    @NotNull
+
     abstract protected List<Service> buildServices();
 
-    @NotNull
+
     abstract protected Future<Void> prepare();
 }

@@ -1,6 +1,8 @@
 package io.github.sinri.keel.app.cli;
 
-import org.jetbrains.annotations.NotNull;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -11,11 +13,12 @@ import java.util.function.Function;
  *
  * @since 5.0.0
  */
+@NullMarked
 class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
     private final Map<String, CommandLineOption> optionMap = new HashMap<>();
     private final Map<String, String> nameToOptionIdMap = new HashMap<>();
 
-    public void addOption(@NotNull CommandLineOption option) throws CommandLineArgumentsDefinitionError {
+    public void addOption(CommandLineOption option) throws CommandLineArgumentsDefinitionError {
         if (optionMap.containsKey(option.id())) {
             throw new CommandLineArgumentsDefinitionError("Duplicate named argument definition id: " + option.id());
         }
@@ -35,16 +38,16 @@ class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
         }
     }
 
-    @NotNull
+
     @Override
     public CommandLineArguments parse(String[] args) throws CommandLineArgumentsParseError {
         var parsedResult = CommandLineArgumentsWriter.create();
 
-        if (args == null || args.length == 0) {
+        if (args.length == 0) {
             return parsedResult.toResult();
         }
 
-        Map<String, String> options = new TreeMap<>();
+        Map<String, @Nullable String> options = new TreeMap<>();
         List<String> parameters = new ArrayList<>();
 
         /*
@@ -57,8 +60,7 @@ class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
         int mode = 0;
         CommandLineOption currentOption = null;
         for (String arg : args) {
-            if (arg == null)
-                continue;
+            // if (arg == null) continue;
             if (mode == 0 || mode == 2) {
                 if ("--".equals(arg)) {
                     mode = 3;
@@ -111,7 +113,7 @@ class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
             String optionValue = entry.getValue();
             CommandLineOption option = optionMap.get(optionId);
             Function<String, Boolean> valueValidator = option.getValueValidator();
-            if (valueValidator != null && !option.isFlag()) {
+            if (valueValidator != null && !option.isFlag() && optionValue != null) {
                 boolean valueValid = valueValidator.apply(optionValue);
                 if (!valueValid) {
                     throw new CommandLineArgumentsParseError(

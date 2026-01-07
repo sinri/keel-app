@@ -2,10 +2,9 @@ package io.github.sinri.keel.app.cli;
 
 import io.github.sinri.keel.app.common.AppLifeCycleMixin;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.atomic.AtomicReference;
+import io.github.sinri.keel.logger.api.LateObject;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -14,9 +13,10 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @since 5.0.0
  */
+@NullMarked
 public abstract class CommandLineExecutable implements AppLifeCycleMixin {
 
-    private final AtomicReference<CommandLineArguments> argumentsRef = new AtomicReference<>();
+    private final LateObject<CommandLineArguments> lateArguments = new LateObject<>();
 
     /**
      * 构建命令行参数解析器的抽象方法。
@@ -24,8 +24,7 @@ public abstract class CommandLineExecutable implements AppLifeCycleMixin {
      *
      * @return 构建的 {@link CommandLineArgumentsParser} 实例，如果不需要解析参数则返回null
      */
-    @Nullable
-    abstract protected CommandLineArgumentsParser buildCommandLineParser();
+    abstract protected @Nullable CommandLineArgumentsParser buildCommandLineParser();
 
     /**
      * 启动CLI程序的入口方法。
@@ -41,9 +40,9 @@ public abstract class CommandLineExecutable implements AppLifeCycleMixin {
         try {
             var argsParser = buildCommandLineParser();
             if (argsParser != null) {
-                this.argumentsRef.set(argsParser.parse(args));
+                this.lateArguments.set(argsParser.parse(args));
             } else {
-                this.argumentsRef.set(new CommandLineArgumentsImpl());
+                this.lateArguments.set(new CommandLineArgumentsImpl());
             }
             runWithCommandLine();
         } catch (Throwable throwable) {
@@ -57,13 +56,8 @@ public abstract class CommandLineExecutable implements AppLifeCycleMixin {
      * @return 已解析的 {@link CommandLineArguments} 对象
      * @throws IllegalStateException 如果命令行参数尚未初始化
      */
-    @NotNull
     public final CommandLineArguments getArguments() {
-        var arguments = argumentsRef.get();
-        if (arguments == null) {
-            throw new IllegalStateException("CliArgs not initialized yet!");
-        }
-        return arguments;
+        return lateArguments.get();
     }
 
     /**

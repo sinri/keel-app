@@ -6,7 +6,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.launcher.application.HookContext;
 import io.vertx.launcher.application.VertxApplication;
 import io.vertx.launcher.application.VertxApplicationHooks;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +18,9 @@ import java.util.List;
  * @see <a href="https://vertx.io/docs/vertx-launcher-application/java/">Vert.x Application Launcher</a>
  * @since 5.0.0
  */
-public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
-    @NotNull
-    private static List<ConfigElement> transformJsonObjectToConfigElements(@NotNull JsonObject jsonObject) {
+@NullMarked
+public interface KeelVertxApplicationHooks extends Keel, VertxApplicationHooks {
+    private static List<ConfigElement> transformJsonObjectToConfigElements(JsonObject jsonObject) {
         List<ConfigElement> list = new ArrayList<>();
 
         jsonObject.forEach(entry -> {
@@ -41,7 +41,7 @@ public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
         return list;
     }
 
-    private static void transformJsonObjectToConfigElement(@NotNull JsonObject jsonObject, @NotNull ConfigElement configElement) {
+    private static void transformJsonObjectToConfigElement(JsonObject jsonObject, ConfigElement configElement) {
         jsonObject.forEach(entry -> {
             String key = entry.getKey();
             var child = configElement.ensureChild(key);
@@ -57,9 +57,6 @@ public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
         });
     }
 
-    @NotNull
-    Keel getKeel();
-
     /**
      * 以给定的参数中可以获取到的 vertx 构建一个 Keel 实例。
      *
@@ -71,7 +68,7 @@ public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
     @Override
     default JsonObject afterConfigParsed(JsonObject config) {
         var configElements = transformJsonObjectToConfigElements(config);
-        configElements.forEach(configElement -> getKeel().getConfiguration().addChild(configElement));
+        configElements.forEach(configElement -> getConfiguration().addChild(configElement));
         return VertxApplicationHooks.super.afterConfigParsed(config);
     }
 }

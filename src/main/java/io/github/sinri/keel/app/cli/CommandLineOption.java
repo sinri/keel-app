@@ -1,7 +1,8 @@
 package io.github.sinri.keel.app.cli;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,24 +22,26 @@ import java.util.regex.Pattern;
  * - 允许为单个选项定义多个别名。<br>
  * - 提供针对预定义模式的别名验证。<br>
  * - 支持为CLI选项添加可选描述。<br>
- - 允许将选项配置为标志（布尔值，无关联值）。<br>
+ * - 允许将选项配置为标志（布尔值，无关联值）。<br>
  * - 提供可选的值验证器来动态验证输入值。<br>
  * - 通过不可变的别名集保护内部状态。<br>
+ *
  * @since 5.0.0
  */
+@NullMarked
 public class CommandLineOption {
     private final static Pattern VALID_ALIAS_PATTERN = Pattern.compile("^[A-Za-z0-9_.][A-Za-z0-9_.-]*$");
     private final static Pattern VALID_SHORT_PATTERN = Pattern.compile("^-[A-Za-z0-9_]$");
     private final static Pattern VALID_LONG_PATTERN = Pattern.compile("^--[A-Za-z0-9_.][A-Za-z0-9_.-]*$");
-    @NotNull
+
     private final String id;
-    @NotNull
+
     private final Set<String> aliasSet;
-    @Nullable
-    private String description;
+
+    private @Nullable String description;
     private boolean flag;
-    @Nullable
-    private Function<String, Boolean> valueValidator;
+
+    private @Nullable Function<String, Boolean> valueValidator;
 
     /**
      * KeelCliOption 类的默认构造函数。
@@ -59,7 +62,7 @@ public class CommandLineOption {
      * @return 如果参数匹配选项格式则返回提取的选项名称，否则返回null
      */
     @Nullable
-    static String parseOptionName(@NotNull String argument) {
+    static String parseOptionName(String argument) {
         if ("--".equals(argument)) return null;
         if (argument.startsWith("--")) {
             if (VALID_LONG_PATTERN.matcher(argument).matches()) {
@@ -83,7 +86,7 @@ public class CommandLineOption {
      * @throws IllegalArgumentException 如果别名为null或不匹配别名模式
      */
     public static String validatedAlias(String alias) {
-        if (alias == null || !VALID_ALIAS_PATTERN.matcher(alias).matches()) {
+        if (!VALID_ALIAS_PATTERN.matcher(alias).matches()) {
             throw new IllegalArgumentException("Alias cannot be null");
         }
         return alias;
@@ -104,7 +107,7 @@ public class CommandLineOption {
      *
      * @return 选项的字符串描述
      */
-    public String description() {
+    public @Nullable String description() {
         return description;
     }
 
@@ -172,7 +175,7 @@ public class CommandLineOption {
      * @return 当前 {@code KeelCliOption} 实例，用于方法链式调用
      * @throws CommandLineArgumentsDefinitionError 如果别名为null或不匹配别名模式
      */
-    public CommandLineOption alias(@NotNull String alias) throws CommandLineArgumentsDefinitionError {
+    public CommandLineOption alias(String alias) throws CommandLineArgumentsDefinitionError {
         try {
             this.aliasSet.add(validatedAlias(alias));
         } catch (IllegalArgumentException illegalArgumentException) {

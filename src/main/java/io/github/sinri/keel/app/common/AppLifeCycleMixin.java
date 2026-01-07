@@ -1,10 +1,13 @@
 package io.github.sinri.keel.app.common;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * 程序的生命周期定义接口。
  *
  * @since 5.0.0
  */
+@NullMarked
 public interface AppLifeCycleMixin {
     /**
      * 启动程序的入口方法。

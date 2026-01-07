@@ -1,28 +1,23 @@
 package io.github.sinri.keel.app.common;
 
-import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.metric.MetricRecorder;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 程序的记录接口。
  *
  * @since 5.0.0
  */
+@NullMarked
 public interface AppRecordingMixin {
     /**
      * 获取日志记录器工厂。
-     * <p>
-     * 这是必备能力，默认提供{@link StdoutLoggerFactory}单例。
      *
      * @return 日志记录器工厂实例
      */
-    @NotNull
-    default LoggerFactory getLoggerFactory() {
-        return StdoutLoggerFactory.getInstance();
-    }
+    LoggerFactory getLoggerFactory();
 
     /**
      * 获取指标记录器。
@@ -31,8 +26,7 @@ public interface AppRecordingMixin {
      *
      * @return 指标记录器实例；默认为空。
      */
-    @Nullable
-    default MetricRecorder getMetricRecorder() {
+    default @Nullable MetricRecorder getMetricRecorder() {
         return null;
     }
 }
