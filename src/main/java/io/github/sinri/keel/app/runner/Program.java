@@ -2,7 +2,8 @@ package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineExecutable;
 import io.github.sinri.keel.app.common.AppRecordingMixin;
-import io.github.sinri.keel.base.Keel;
+import io.github.sinri.keel.base.async.KeelAsyncMixin;
+import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.logger.api.LateObject;
@@ -25,24 +26,15 @@ import java.io.IOException;
  * @since 5.0.0
  */
 @NullMarked
-public abstract class Program extends CommandLineExecutable implements AppRecordingMixin, Keel {
+public abstract class Program extends CommandLineExecutable implements AppRecordingMixin, KeelAsyncMixin {
 
-    // private final ConfigElement rootConfigElement;
     private final LateObject<Vertx> lateVertx = new LateObject<>();
-    // private LoggerFactory loggerFactory;
     private Logger logger;
     private @Nullable MetricRecorder metricRecorder;
 
     public Program() {
-        // this.rootConfigElement = new ConfigElement("");
-        // this.loggerFactory = StdoutLoggerFactory.getInstance();
         this.resetLogger();
     }
-
-    //    @Override
-    //    public ConfigElement getConfiguration() {
-    //        return rootConfigElement;
-    //    }
 
     @Override
     public @Nullable MetricRecorder getMetricRecorder() {
@@ -97,11 +89,11 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                   this.getLogger().info("REMOTE CONFIG LOADED (if any)");
 
                   // customized logging
+                  LoggerFactory existedLoggerFactory = LoggerFactory.getShared();
                   return buildLoggerFactory()
                           .compose(builtLoggerFactory -> {
-                              if (builtLoggerFactory != SHARED_LOGGER_FACTORY_REF.get()) {
-                                  //loggerFactory = builtLoggerFactory;
-                                  SHARED_LOGGER_FACTORY_REF.set(builtLoggerFactory);
+                              if (builtLoggerFactory != existedLoggerFactory) {
+                                  LoggerFactory.replaceShared(builtLoggerFactory);
                                   this.resetLogger();
                                   getLogger().info("CUSTOM LOGGER FACTORY CENTER LOADED");
                               }
@@ -132,7 +124,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
     }
 
     protected void loadLocalConfiguration() throws IOException {
-        getConfiguration().loadPropertiesFile("config.properties");
+        ConfigElement.root().loadPropertiesFile("config.properties");
     }
 
     protected Future<Void> loadRemoteConfiguration() {
@@ -151,8 +143,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
 
     @Override
     public final LoggerFactory getLoggerFactory() {
-        // return loggerFactory;
-        return Keel.super.getLoggerFactory();
+        return LoggerFactory.getShared();
     }
 
     protected Future<LoggerFactory> buildLoggerFactory() {

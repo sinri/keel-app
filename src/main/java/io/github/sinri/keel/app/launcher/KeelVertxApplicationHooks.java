@@ -1,6 +1,6 @@
 package io.github.sinri.keel.app.launcher;
 
-import io.github.sinri.keel.base.Keel;
+import io.github.sinri.keel.base.async.KeelAsyncMixin;
 import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.vertx.core.json.JsonObject;
 import io.vertx.launcher.application.HookContext;
@@ -13,13 +13,13 @@ import java.util.List;
 
 
 /**
- * 如果你使用 Vert.x Application Launcher，你可以使用这个 hooks 扩展接口来基于 vertx 和配置构建 {@link Keel} 实例。
+ * 如果你使用 Vert.x Application Launcher，你可以使用这个 hooks 扩展接口来基于 vertx 和配置构建 {@link KeelAsyncMixin} 实例。
  *
  * @see <a href="https://vertx.io/docs/vertx-launcher-application/java/">Vert.x Application Launcher</a>
  * @since 5.0.0
  */
 @NullMarked
-public interface KeelVertxApplicationHooks extends Keel, VertxApplicationHooks {
+public interface KeelVertxApplicationHooks extends KeelAsyncMixin, VertxApplicationHooks {
     private static List<ConfigElement> transformJsonObjectToConfigElements(JsonObject jsonObject) {
         List<ConfigElement> list = new ArrayList<>();
 
@@ -68,7 +68,7 @@ public interface KeelVertxApplicationHooks extends Keel, VertxApplicationHooks {
     @Override
     default JsonObject afterConfigParsed(JsonObject config) {
         var configElements = transformJsonObjectToConfigElements(config);
-        configElements.forEach(configElement -> getConfiguration().addChild(configElement));
+        configElements.forEach(configElement -> ConfigElement.root().addChild(configElement));
         return VertxApplicationHooks.super.afterConfigParsed(config);
     }
 }

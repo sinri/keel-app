@@ -49,18 +49,12 @@ class MonitorServiceLoggerImpl extends AbstractMonitorService {
 
         final JsonObject snapshot = new JsonObject();
         snapshot.put("survived", System.currentTimeMillis() - startTimestamp);
-        GCStatResult gcStat = monitorSnapshot.getGCStat();
-        if (gcStat != null) {
-            snapshot.put("gc", gcStat.toJsonObject());
-        }
-        CPUTimeResult cpuTime = monitorSnapshot.getCPUTime();
-        if (cpuTime != null) {
-            snapshot.put("cpu_time", cpuTime.toJsonObject());
-        }
-        JVMMemoryResult jvmMemoryResult = monitorSnapshot.getJvmMemoryResult();
-        if (jvmMemoryResult != null) {
-            snapshot.put("jvm_memory_stat", jvmMemoryResult.toJsonObject());
-        }
+        GCStatResult gcStat = monitorSnapshot.gcStat();
+        snapshot.put("gc", gcStat.toJsonObject());
+        CPUTimeResult cpuTime = monitorSnapshot.cpuTime();
+        snapshot.put("cpu_time", cpuTime.toJsonObject());
+        JVMMemoryResult jvmMemoryResult = monitorSnapshot.jvmMemoryResult();
+        snapshot.put("jvm_memory_stat", jvmMemoryResult.toJsonObject());
 
         if (specialSnapshotModifier != null) {
             specialSnapshotModifier.accept(monitorSnapshot, snapshot);
@@ -68,19 +62,12 @@ class MonitorServiceLoggerImpl extends AbstractMonitorService {
 
         log.snapshot(snapshot);
 
-        if (jvmMemoryResult != null && cpuTime != null) {
-            double heapUsage = 1.0 * jvmMemoryResult.getRuntimeHeapUsedBytes()
-                    / jvmMemoryResult.getRuntimeHeapMaxBytes();
-            if (cpuTime.getCpuUsage() >= 0.50 || heapUsage >= 0.50) {
-                log.level(LogLevel.WARNING);
-            }
-            if (cpuTime.getCpuUsage() >= 0.75 || heapUsage >= 0.75
-                    || monitorSnapshot.getGCStat().getMajorGCCount() > 0) {
-                log.level(LogLevel.ERROR);
-            }
-        } else {
-            // cannot monitor key info!
-            log.level(LogLevel.FATAL);
+        double heapUsage = 1.0 * jvmMemoryResult.runtimeHeapUsedBytes() / jvmMemoryResult.runtimeHeapMaxBytes();
+        if (cpuTime.cpuUsage() >= 0.50 || heapUsage >= 0.50) {
+            log.level(LogLevel.WARNING);
+        }
+        if (cpuTime.cpuUsage() >= 0.75 || heapUsage >= 0.75 || gcStat.majorGCCount() > 0) {
+            log.level(LogLevel.ERROR);
         }
 
         this.lateLogger.get().log(log);

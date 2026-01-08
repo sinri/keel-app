@@ -67,73 +67,67 @@ class MonitorServiceMetricImpl extends AbstractMonitorService {
                 null
         ));
 
-        JVMMemoryResult jvmMemoryResult = monitorSnapshot.getJvmMemoryResult();
-        if (jvmMemoryResult != null) {
-            metricRecorder.recordMetric(MetricRecord.create(
-                    jvmMemoryResult.getStatTime(),
-                    METRIC_HARDWARE_MEMORY_USAGE,
-                    1.0 * jvmMemoryResult.getPhysicalUsedBytes()
-                            / jvmMemoryResult.getPhysicalMaxBytes(),
-                    null
-            ));
-            metricRecorder.recordMetric(MetricRecord.create(
-                    monitorSnapshot.getJvmMemoryResult().getStatTime(),
-                    METRIC_JVM_MEMORY_USAGE,
-                    1.0 * jvmMemoryResult.getRuntimeHeapUsedBytes()
-                            / jvmMemoryResult.getRuntimeHeapMaxBytes(),
-                    null
-            ));
-            metricRecorder.recordMetric(MetricRecord.create(
-                    jvmMemoryResult.getStatTime(),
-                    METRIC_JVM_HEAP_MEMORY_USED_BYTES,
-                    jvmMemoryResult.getMxHeapUsedBytes(),
-                    null
-            ));
-            metricRecorder.recordMetric(MetricRecord.create(
-                    jvmMemoryResult.getStatTime(),
-                    METRIC_JVM_NON_HEAP_MEMORY_USED_BYTES,
-                    jvmMemoryResult.getMxNonHeapUsedBytes(),
-                    null
-            ));
-        }
+        JVMMemoryResult jvmMemoryResult = monitorSnapshot.jvmMemoryResult();
+        metricRecorder.recordMetric(MetricRecord.create(
+                jvmMemoryResult.statTime(),
+                METRIC_HARDWARE_MEMORY_USAGE,
+                1.0 * jvmMemoryResult.physicalUsedBytes()
+                        / jvmMemoryResult.physicalMaxBytes(),
+                null
+        ));
+        metricRecorder.recordMetric(MetricRecord.create(
+                monitorSnapshot.jvmMemoryResult().statTime(),
+                METRIC_JVM_MEMORY_USAGE,
+                1.0 * jvmMemoryResult.runtimeHeapUsedBytes()
+                        / jvmMemoryResult.runtimeHeapMaxBytes(),
+                null
+        ));
+        metricRecorder.recordMetric(MetricRecord.create(
+                jvmMemoryResult.statTime(),
+                METRIC_JVM_HEAP_MEMORY_USED_BYTES,
+                jvmMemoryResult.mxHeapUsedBytes(),
+                null
+        ));
+        metricRecorder.recordMetric(MetricRecord.create(
+                jvmMemoryResult.statTime(),
+                METRIC_JVM_NON_HEAP_MEMORY_USED_BYTES,
+                jvmMemoryResult.mxNonHeapUsedBytes(),
+                null
+        ));
 
-        CPUTimeResult cpuTime = monitorSnapshot.getCPUTime();
-        if (cpuTime != null) {
-            metricRecorder.recordMetric(MetricRecord.create(
-                    cpuTime.getStatTime(),
-                    METRIC_CPU_USAGE,
-                    cpuTime.getCpuUsage(),
-                    null
-            ));
-        }
+        CPUTimeResult cpuTime = monitorSnapshot.cpuTime();
+        metricRecorder.recordMetric(MetricRecord.create(
+                cpuTime.statTime(),
+                METRIC_CPU_USAGE,
+                cpuTime.cpuUsage(),
+                null
+        ));
 
-        GCStatResult gcStat = monitorSnapshot.getGCStat();
-        if (gcStat != null) {
-            metricRecorder.recordMetric(MetricRecord.create(
-                    gcStat.getStatTime(),
-                    METRIC_MAJOR_GC_COUNT,
-                    gcStat.getMajorGCCount(),
-                    null
-            ));
-            metricRecorder.recordMetric(MetricRecord.create(
-                    gcStat.getStatTime(),
-                    METRIC_MAJOR_GC_TIME,
-                    gcStat.getMajorGCTime(),
-                    null
-            ));
-            metricRecorder.recordMetric(MetricRecord.create(
-                    gcStat.getStatTime(),
-                    METRIC_MINOR_GC_COUNT,
-                    gcStat.getMinorGCCount(),
-                    null
-            ));
-            metricRecorder.recordMetric(MetricRecord.create(
-                    gcStat.getStatTime(),
-                    METRIC_MINOR_GC_TIME,
-                    gcStat.getMinorGCTime(),
-                    null
-            ));
-        }
+        GCStatResult gcStat = monitorSnapshot.gcStat();
+        metricRecorder.recordMetric(MetricRecord.create(
+                gcStat.statTime(),
+                METRIC_MAJOR_GC_COUNT,
+                gcStat.majorGCCount(),
+                null
+        ));
+        metricRecorder.recordMetric(MetricRecord.create(
+                gcStat.statTime(),
+                METRIC_MAJOR_GC_TIME,
+                gcStat.majorGCTime(),
+                null
+        ));
+        metricRecorder.recordMetric(MetricRecord.create(
+                gcStat.statTime(),
+                METRIC_MINOR_GC_COUNT,
+                gcStat.minorGCCount(),
+                null
+        ));
+        metricRecorder.recordMetric(MetricRecord.create(
+                gcStat.statTime(),
+                METRIC_MINOR_GC_TIME,
+                gcStat.minorGCTime(),
+                null
+        ));
 
         if (this.specialSnapshotModifier != null) {
             List<MetricRecord> list = this.specialSnapshotModifier.apply(monitorSnapshot);
