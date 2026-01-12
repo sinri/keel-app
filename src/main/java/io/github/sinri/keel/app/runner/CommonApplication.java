@@ -2,7 +2,14 @@ package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineOption;
 import io.github.sinri.keel.app.runner.service.*;
+import io.github.sinri.keel.base.configuration.ConfigElement;
+import io.github.sinri.keel.integration.aliyun.sls.AliyunSlsConfigElement;
+import io.github.sinri.keel.integration.aliyun.sls.SlsLoggerFactory;
 import io.github.sinri.keel.logger.api.LateObject;
+import io.github.sinri.keel.logger.api.factory.LoggerFactory;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.ThreadingModel;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -85,6 +92,16 @@ public abstract class CommonApplication extends Application {
 
     protected boolean isReceptionistDisabled() {
         return getArguments().readFlag(optionDisableReceptionist);
+    }
+
+    @Override
+    protected Future<LoggerFactory> buildLoggerFactory() {
+        AliyunSlsConfigElement aliyunSlsConfigElement = AliyunSlsConfigElement.forSls(ConfigElement.root());
+        SlsLoggerFactory slsLoggerFactory = new SlsLoggerFactory(aliyunSlsConfigElement);
+        return slsLoggerFactory.deployMe(getVertx(), new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER))
+                               .compose(v -> {
+                                   return Future.succeededFuture(slsLoggerFactory);
+                               });
     }
 
     @Override

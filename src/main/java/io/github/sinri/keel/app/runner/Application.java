@@ -78,6 +78,5 @@ public abstract class Application extends Program {
 
     abstract protected List<Service> buildServices();
 
-
     abstract protected Future<Void> prepare();
 }

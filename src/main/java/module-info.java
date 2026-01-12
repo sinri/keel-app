@@ -22,6 +22,8 @@ module keel.app.main {
     requires transitive com.fasterxml.jackson.databind;
 
     requires static org.jspecify;
+    requires io.github.sinri.keel.integration.aliyun;
+    requires java.desktop;
 
     exports io.github.sinri.keel.app.cli;
     exports io.github.sinri.keel.app.common;
