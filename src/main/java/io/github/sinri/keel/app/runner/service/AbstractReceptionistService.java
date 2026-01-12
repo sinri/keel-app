@@ -7,6 +7,9 @@ import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.vertx.core.Future;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * 通过 HTTP 协议处理请求的服务。
@@ -32,9 +35,21 @@ public abstract class AbstractReceptionistService extends KeelHttpServer impleme
         return this.getApplication().getLoggerFactory();
     }
 
-    public int getListenPort() {
+    @Override
+    protected int getHttpServerPort() {
+        Integer port = readConfiguredListenPort();
+        return Objects.requireNonNullElseGet(port, super::getHttpServerPort);
+    }
+
+    /**
+     * 从运行参数中尝试获取服务监听端口。
+     *
+     * @return 运行参数中定义的服务监听端口
+     * @see AbstractReceptionistService#getHttpServerPort()
+     */
+    public @Nullable Integer readConfiguredListenPort() {
         String s = getApplication().getArguments().readOption(CommonApplication.optionReceptionistPort);
-        return (s == null ? 8080 : Integer.parseInt(s));
+        return (s == null ? null : Integer.parseInt(s));
     }
 
     @Override
