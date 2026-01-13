@@ -92,6 +92,8 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                   LoggerFactory existedLoggerFactory = LoggerFactory.getShared();
                   return buildLoggerFactory()
                           .compose(builtLoggerFactory -> {
+                              this.getLogger()
+                                  .info("BUILT LOGGER FACTORY CENTER: " + builtLoggerFactory.getClass().getName());
                               if (builtLoggerFactory != existedLoggerFactory) {
                                   LoggerFactory.replaceShared(builtLoggerFactory);
                                   this.resetLogger();
@@ -105,6 +107,8 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                   return buildMetricRecorder()
                           .compose(builtMetricRecorder -> {
                               if (builtMetricRecorder != null) {
+                                  getLogger().info("BUILT METRIC RECORDER: " + builtMetricRecorder.getClass()
+                                                                                                  .getName());
                                   this.metricRecorder = builtMetricRecorder;
                                   getLogger().info("CUSTOM METRIC RECORDER LOADED");
                               }
@@ -112,6 +116,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                           });
               })
               .compose(v -> {
+                  getLogger().info("LAUNCHING AS PROGRAM");
                   return launchAsProgram();
               })
               .onSuccess(done -> {

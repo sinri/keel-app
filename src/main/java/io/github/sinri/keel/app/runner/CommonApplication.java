@@ -101,6 +101,9 @@ public abstract class CommonApplication extends Application {
         return slsLoggerFactory.deployMe(getVertx(), new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER))
                                .compose(v -> {
                                    return Future.succeededFuture(slsLoggerFactory);
+                               }, throwable -> {
+                                   System.err.println("Failed to deploy SlsLoggerFactory: " + throwable.getMessage());
+                                   return Future.failedFuture(throwable);
                                });
     }
 
