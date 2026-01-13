@@ -5,7 +5,7 @@ import io.github.sinri.keel.base.verticles.KeelVerticleBase;
 import io.github.sinri.keel.core.utils.runtime.KeelRuntimeMonitor;
 import io.github.sinri.keel.core.utils.runtime.MonitorSnapshot;
 import io.github.sinri.keel.logger.api.LateObject;
-import io.github.sinri.keel.logger.api.factory.LoggerFactory;
+import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.logger.api.metric.MetricRecord;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -47,11 +47,6 @@ public abstract class AbstractMonitorService extends KeelVerticleBase implements
     }
 
     @Override
-    public LoggerFactory getLoggerFactory() {
-        return getApplication().getLoggerFactory();
-    }
-
-    @Override
     protected Future<Void> startVerticle() {
         new KeelRuntimeMonitor(getVertx()).startRuntimeMonitor(getInterval(), this::handleMonitorSnapshot);
         return Future.succeededFuture();
@@ -66,5 +61,10 @@ public abstract class AbstractMonitorService extends KeelVerticleBase implements
         lateApplication.set(application);
         return deployMe(application.getVertx(), new DeploymentOptions()
                 .setThreadingModel(ThreadingModel.WORKER));
+    }
+
+    @Override
+    public final Logger getStdoutLogger() {
+        return getApplication().getStdoutLogger();
     }
 }

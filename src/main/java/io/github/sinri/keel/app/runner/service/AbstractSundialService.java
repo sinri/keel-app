@@ -5,6 +5,7 @@ import io.github.sinri.keel.core.servant.sundial.Sundial;
 import io.github.sinri.keel.core.servant.sundial.SundialPlan;
 import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
+import io.github.sinri.keel.logger.api.logger.Logger;
 import io.vertx.core.Future;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -34,6 +35,11 @@ public abstract class AbstractSundialService extends Sundial implements Service 
             protected Future<@Nullable Collection<SundialPlan>> fetchPlans() {
                 return plansFetcher.get();
             }
+
+            @Override
+            public LoggerFactory getLoggerFactory() {
+                return LoggerFactory.getShared();
+            }
         };
     }
 
@@ -44,8 +50,8 @@ public abstract class AbstractSundialService extends Sundial implements Service 
     }
 
     @Override
-    public final LoggerFactory getLoggerFactory() {
-        return getApplication().getLoggerFactory();
+    public final Logger getStdoutLogger() {
+        return getApplication().getStdoutLogger();
     }
 
     @Override

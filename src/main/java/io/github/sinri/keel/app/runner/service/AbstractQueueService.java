@@ -3,7 +3,7 @@ package io.github.sinri.keel.app.runner.service;
 import io.github.sinri.keel.app.runner.Application;
 import io.github.sinri.keel.core.servant.queue.QueueDispatcher;
 import io.github.sinri.keel.logger.api.LateObject;
-import io.github.sinri.keel.logger.api.factory.LoggerFactory;
+import io.github.sinri.keel.logger.api.logger.Logger;
 import io.vertx.core.Future;
 import org.jspecify.annotations.NullMarked;
 
@@ -27,9 +27,8 @@ public abstract class AbstractQueueService extends QueueDispatcher implements Se
     }
 
     @Override
-    public
-    final LoggerFactory getLoggerFactory() {
-        return getApplication().getLoggerFactory();
+    public final Logger getStdoutLogger() {
+        return getApplication().getStdoutLogger();
     }
 
     @Override

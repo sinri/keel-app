@@ -40,8 +40,8 @@ public abstract class Application extends Program {
 
     @Override
     public void handleError(Throwable throwable) {
-        getLogger().error("Program: " + buildCliName());
-        getLogger().error("Description: " + buildCliDescription());
+        getStdoutLogger().error("Program: " + buildCliName());
+        getStdoutLogger().error("Description: " + buildCliDescription());
         super.handleError(throwable);
     }
 
@@ -53,20 +53,20 @@ public abstract class Application extends Program {
                     return asyncCallIteratively(
                             services,
                             service -> {
-                                getLogger().info("For service %s".formatted(service.getClass().getName()));
+                                getStdoutLogger().info("For service %s".formatted(service.getClass().getName()));
                                 return service.deployMe(this)
                                               .compose(deploymentID -> {
-                                                  getLogger().info("Deployed verticle %s with deploymentID %s".formatted(
+                                                  getStdoutLogger().info("Deployed verticle %s with deploymentID %s".formatted(
                                                           service.getClass().getName(), deploymentID
                                                   ));
                                                   return Future.succeededFuture();
                                               }, throwable -> {
-                                                  getLogger().error(x -> x.exception(throwable)
-                                                                          .message("Failed to deploy verticle %s"
+                                                  getStdoutLogger().error(x -> x.exception(throwable)
+                                                                                .message("Failed to deploy verticle %s"
                                                                                   .formatted(service.getClass()
                                                                                                     .getName())));
                                                   if (service.isIndispensableService()) {
-                                                      getLogger().fatal("Indispensable service failed, go die!");
+                                                      getStdoutLogger().fatal("Indispensable service failed, go die!");
                                                       return Future.failedFuture(throwable);
                                                   }
                                                   return Future.succeededFuture();
@@ -74,7 +74,7 @@ public abstract class Application extends Program {
                             }
                     )
                             .compose(v -> {
-                                getLogger().info("All services deployed");
+                                getStdoutLogger().info("All services deployed");
                                 return Future.succeededFuture();
                             });
                 });

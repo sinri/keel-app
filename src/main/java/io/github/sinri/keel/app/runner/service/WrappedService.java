@@ -3,7 +3,7 @@ package io.github.sinri.keel.app.runner.service;
 import io.github.sinri.keel.app.runner.Application;
 import io.github.sinri.keel.base.verticles.KeelVerticleBase;
 import io.github.sinri.keel.logger.api.LateObject;
-import io.github.sinri.keel.logger.api.factory.LoggerFactory;
+import io.github.sinri.keel.logger.api.logger.Logger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import org.jspecify.annotations.NullMarked;
@@ -44,8 +44,8 @@ class WrappedService extends KeelVerticleBase implements Service {
     }
 
     @Override
-    public LoggerFactory getLoggerFactory() {
-        return getApplication().getLoggerFactory();
+    public Logger getStdoutLogger() {
+        return getApplication().getStdoutLogger();
     }
 
     @Override

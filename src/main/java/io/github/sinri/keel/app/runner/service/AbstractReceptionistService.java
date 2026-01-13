@@ -4,6 +4,7 @@ import io.github.sinri.keel.app.runner.Application;
 import io.github.sinri.keel.app.runner.CommonApplication;
 import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
+import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.vertx.core.Future;
 import org.jspecify.annotations.NullMarked;
@@ -31,8 +32,13 @@ public abstract class AbstractReceptionistService extends KeelHttpServer impleme
     }
 
     @Override
-    public LoggerFactory getLoggerFactory() {
-        return this.getApplication().getLoggerFactory();
+    public final LoggerFactory getLoggerFactory() {
+        return getApplication().getLoggerFactory();
+    }
+
+    @Override
+    public final Logger getStdoutLogger() {
+        return getApplication().getStdoutLogger();
     }
 
     @Override

@@ -29,21 +29,26 @@ import java.io.IOException;
 public abstract class Program extends CommandLineExecutable implements AppRecordingMixin, KeelAsyncMixin {
 
     private final LateObject<Vertx> lateVertx = new LateObject<>();
-    private Logger logger;
-    private @Nullable MetricRecorder metricRecorder;
+    /**
+     * 面向标准输出的日志记录器。
+     */
+    private final Logger loggerToStdout;
+    private final LateObject<MetricRecorder> lateMetricRecorder = new LateObject<>();
 
     public Program() {
-        this.resetLogger();
+        this.loggerToStdout = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
     }
 
     @Override
     public @Nullable MetricRecorder getMetricRecorder() {
-        return metricRecorder;
+        if (lateMetricRecorder.isInitialized())
+            return lateMetricRecorder.get();
+        else return null;
     }
 
     @Override
     public void handleError(Throwable throwable) {
-        this.getLogger().fatal(log -> {
+        this.getStdoutLogger().fatal(log -> {
             log.exception(throwable);
             log.message("Program Error");
         });
@@ -61,7 +66,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        this.getLogger().info("LOCAL CONFIG LOADED (if any)");
+        this.getStdoutLogger().info("LOCAL CONFIG LOADED (if any)");
 
         VertxOptions vertxOptions = buildVertxOptions();
         ClusterManager clusterManager = buildClusterManager();
@@ -82,22 +87,21 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                   }
               })
               .compose(initialized -> {
-                  this.getLogger().info("KEEL INITIALIZED");
+                  this.getStdoutLogger().info("KEEL INITIALIZED");
                   return loadRemoteConfiguration();
               })
               .compose(done -> {
-                  this.getLogger().info("REMOTE CONFIG LOADED (if any)");
+                  this.getStdoutLogger().info("REMOTE CONFIG LOADED (if any)");
 
                   // customized logging
                   LoggerFactory existedLoggerFactory = LoggerFactory.getShared();
                   return buildLoggerFactory()
                           .compose(builtLoggerFactory -> {
-                              this.getLogger()
+                              this.getStdoutLogger()
                                   .info("BUILT LOGGER FACTORY CENTER: " + builtLoggerFactory.getClass().getName());
                               if (builtLoggerFactory != existedLoggerFactory) {
                                   LoggerFactory.replaceShared(builtLoggerFactory);
-                                  this.resetLogger();
-                                  getLogger().info("CUSTOM LOGGER FACTORY CENTER LOADED");
+                                  getStdoutLogger().info("CUSTOM LOGGER FACTORY CENTER LOADED");
                               }
                               return Future.succeededFuture();
                           });
@@ -107,16 +111,16 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                   return buildMetricRecorder()
                           .compose(builtMetricRecorder -> {
                               if (builtMetricRecorder != null) {
-                                  getLogger().info("BUILT METRIC RECORDER: " + builtMetricRecorder.getClass()
-                                                                                                  .getName());
-                                  this.metricRecorder = builtMetricRecorder;
-                                  getLogger().info("CUSTOM METRIC RECORDER LOADED");
+                                  getStdoutLogger().info("BUILT METRIC RECORDER: " + builtMetricRecorder.getClass()
+                                                                                                        .getName());
+                                  this.lateMetricRecorder.set(builtMetricRecorder);
+                                  getStdoutLogger().info("CUSTOM METRIC RECORDER LOADED");
                               }
                               return Future.succeededFuture();
                           });
               })
               .compose(v -> {
-                  getLogger().info("LAUNCHING AS PROGRAM");
+                  getStdoutLogger().info("LAUNCHING AS PROGRAM");
                   return launchAsProgram();
               })
               .onSuccess(done -> {
@@ -146,22 +150,17 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
         return null;
     }
 
-    @Override
-    public final LoggerFactory getLoggerFactory() {
-        return LoggerFactory.getShared();
-    }
-
     protected Future<LoggerFactory> buildLoggerFactory() {
         return Future.succeededFuture(StdoutLoggerFactory.getInstance());
     }
 
-    private void resetLogger() {
-        this.logger = this.getLoggerFactory().createLogger(getClass().getName());
-    }
-
-
-    public final Logger getLogger() {
-        return logger;
+    /**
+     * 面向标准输出的日志记录器，用于程序底层日志。
+     *
+     * @return 面向标准输出的日志记录器。
+     */
+    public final Logger getStdoutLogger() {
+        return loggerToStdout;
     }
 
 
@@ -181,7 +180,7 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
 
     protected void whenLaunched(long startTime) {
         long endTime = System.currentTimeMillis();
-        this.getLogger().notice("Warship launched, spent " + (endTime - startTime) + " ms");
+        this.getStdoutLogger().notice("Warship launched, spent " + (endTime - startTime) + " ms");
     }
 
     protected void affix() {

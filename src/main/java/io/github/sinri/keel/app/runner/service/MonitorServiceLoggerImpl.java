@@ -7,6 +7,7 @@ import io.github.sinri.keel.core.utils.runtime.JVMMemoryResult;
 import io.github.sinri.keel.core.utils.runtime.MonitorSnapshot;
 import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.LogLevel;
+import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.logger.SpecificLogger;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -39,7 +40,7 @@ class MonitorServiceLoggerImpl extends AbstractMonitorService {
 
     @Override
     protected Future<Void> startVerticle() {
-        lateLogger.set(getLoggerFactory().createLogger(MonitorLog.TopicHealthMonitor, MonitorLog::new));
+        lateLogger.set(LoggerFactory.getShared().createLogger(MonitorLog.TopicHealthMonitor, MonitorLog::new));
         return super.startVerticle();
     }
 
