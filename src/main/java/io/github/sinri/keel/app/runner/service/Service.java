@@ -29,4 +29,15 @@ public interface Service extends AppRecordingMixin, VertxHolder, KeelAsyncMixin,
     Application getApplication();
 
     Future<String> deployMe(Application application);
+
+    /**
+     * 注明本服务是否为不可或缺的，如果是，则当部署失败是触发程序启动异常。
+     * <p>
+     * 默认为 true。
+     *
+     * @return 本服务是否为不可或缺的
+     */
+    default boolean isIndispensableService() {
+        return true;
+    }
 }

@@ -62,8 +62,13 @@ public abstract class Application extends Program {
                                                   return Future.succeededFuture();
                                               }, throwable -> {
                                                   getLogger().error(x -> x.exception(throwable)
-                                                                          .message("Failed to deploy verticle %s".formatted(service.getClass()
-                                                                                                                                   .getName())));
+                                                                          .message("Failed to deploy verticle %s"
+                                                                                  .formatted(service.getClass()
+                                                                                                    .getName())));
+                                                  if (service.isIndispensableService()) {
+                                                      getLogger().fatal("Indispensable service failed, go die!");
+                                                      return Future.failedFuture(throwable);
+                                                  }
                                                   return Future.succeededFuture();
                                               });
                             }
