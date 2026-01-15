@@ -2,6 +2,7 @@ package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineExecutable;
 import io.github.sinri.keel.app.common.AppRecordingMixin;
+import io.github.sinri.keel.base.SharedVertxStorage;
 import io.github.sinri.keel.base.async.KeelAsyncMixin;
 import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.github.sinri.keel.base.json.JsonifiableSerializer;
@@ -28,7 +29,6 @@ import java.io.IOException;
 @NullMarked
 public abstract class Program extends CommandLineExecutable implements AppRecordingMixin, KeelAsyncMixin {
 
-    private final LateObject<Vertx> lateVertx = new LateObject<>();
     /**
      * 面向标准输出的日志记录器。
      */
@@ -76,12 +76,12 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
                   if (clusterManager == null) {
                       // NOT SUPPORT CLUSTER MODE
                       Vertx tempVertx = Vertx.builder().with(vertxOptions).build();
-                      lateVertx.set(tempVertx);
+                      SharedVertxStorage.set(tempVertx);
                       return Future.succeededFuture();
                   } else {
                       return Vertx.builder().withClusterManager(clusterManager).with(vertxOptions).buildClustered()
                                   .compose(built -> {
-                                      this.lateVertx.set(built);
+                                      SharedVertxStorage.set(built);
                                       return Future.succeededFuture();
                                   });
                   }
@@ -188,6 +188,6 @@ public abstract class Program extends CommandLineExecutable implements AppRecord
     }
 
     public final Vertx getVertx() {
-        return lateVertx.get();
+        return SharedVertxStorage.get();
     }
 }
