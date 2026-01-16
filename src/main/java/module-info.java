@@ -2,6 +2,7 @@ module keel.app.main {
     requires transitive io.github.sinri.keel.base;
     requires transitive io.github.sinri.keel.core;
     requires transitive io.github.sinri.keel.logger.api;
+    // requires transitive io.github.sinri.keel.logger.ext;
     requires transitive io.github.sinri.keel.web;
 
     requires transitive io.vertx.core;
