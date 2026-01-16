@@ -1,5 +1,6 @@
 package io.github.sinri.keel.app.runner;
 
+import io.github.sinri.keel.app.cli.CommandLineArguments;
 import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.metric.MetricRecorder;
@@ -29,4 +30,8 @@ public interface ProgramContext {
     default LoggerFactory getLoggerFactory() {
         return LoggerFactory.getShared();
     }
+
+    CommandLineArguments getParsedCliArguments();
+
+    void setParsedCliArguments(CommandLineArguments arguments);
 }

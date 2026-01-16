@@ -1,6 +1,7 @@
 package io.github.sinri.keel.app.runner.service;
 
-import io.github.sinri.keel.app.runner.Application;
+import io.github.sinri.keel.app.runner.ProgramContext;
+import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.base.verticles.KeelVerticleBase;
 import io.github.sinri.keel.core.utils.runtime.KeelRuntimeMonitor;
 import io.github.sinri.keel.core.utils.runtime.MonitorSnapshot;
@@ -10,6 +11,7 @@ import io.github.sinri.keel.logger.api.metric.MetricRecord;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.ThreadingModel;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -26,24 +28,26 @@ import java.util.function.Function;
  * @since 5.0.0
  */
 @NullMarked
-public abstract class AbstractMonitorService extends KeelVerticleBase implements Service {
-    private final LateObject<Application> lateApplication = new LateObject<>();
+public abstract class AbstractMonitorService<P extends ProgramContext> extends KeelVerticleBase implements Service<P> {
+    private final LateObject<P> lateProgramContext = new LateObject<>();
+    private final Logger logger;
 
     public AbstractMonitorService() {
         super();
+        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
     }
 
-    public static AbstractMonitorService throughLogger(@Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier) {
-        return new MonitorServiceLoggerImpl(specialSnapshotModifier);
+    public static <P extends ProgramContext> AbstractMonitorService<P> throughLogger(@Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier) {
+        return new MonitorServiceLoggerImpl<>(specialSnapshotModifier);
     }
 
-    public static AbstractMonitorService throughMetricRecorder(@Nullable Function<MonitorSnapshot, List<MetricRecord>> specialSnapshotModifier) {
-        return new MonitorServiceMetricImpl(specialSnapshotModifier);
+    public static <P extends ProgramContext> AbstractMonitorService<P> throughMetricRecorder(@Nullable Function<MonitorSnapshot, List<MetricRecord>> specialSnapshotModifier) {
+        return new MonitorServiceMetricImpl<>(specialSnapshotModifier);
     }
 
     @Override
-    public Application getApplication() {
-        return lateApplication.get();
+    public final P getProgramContext() {
+        return lateProgramContext.get();
     }
 
     @Override
@@ -57,14 +61,14 @@ public abstract class AbstractMonitorService extends KeelVerticleBase implements
     abstract protected void handleMonitorSnapshot(MonitorSnapshot monitorSnapshot);
 
     @Override
-    public final Future<String> deployMe(Application application) {
-        lateApplication.set(application);
-        return deployMe(application.getVertx(), new DeploymentOptions()
+    public Future<String> deployMe(Vertx vertx, P programContext) {
+        lateProgramContext.set(programContext);
+        return deployMe(vertx, new DeploymentOptions()
                 .setThreadingModel(ThreadingModel.WORKER));
     }
 
     @Override
     public final Logger getStdoutLogger() {
-        return getApplication().getStdoutLogger();
+        return logger;
     }
 }

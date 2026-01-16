@@ -39,10 +39,10 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
     public static final String optionDisableReceptionist = "disableReceptionist";
     public static final String optionReceptionistPort = "receptionistPort";
 
-    private final LateObject<AbstractMonitorService> lateMonitorService = new LateObject<>();
-    private final LateObject<AbstractQueueService> lateQueueService = new LateObject<>();
-    private final LateObject<AbstractSundialService> lateSundialService = new LateObject<>();
-    private final LateObject<AbstractReceptionistService> lateReceptionistService = new LateObject<>();
+    private final LateObject<AbstractMonitorService<C>> lateMonitorService = new LateObject<>();
+    private final LateObject<AbstractQueueService<C>> lateQueueService = new LateObject<>();
+    private final LateObject<AbstractSundialService<C>> lateSundialService = new LateObject<>();
+    private final LateObject<AbstractReceptionistService<C>> lateReceptionistService = new LateObject<>();
 
     @Override
     protected @Nullable List<CommandLineOption> buildCliOptions() {
@@ -108,11 +108,11 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
     }
 
     @Override
-    protected List<Service> buildServices() {
-        List<Service> services = new ArrayList<>();
+    protected List<Service<C>> buildServices() {
+        List<Service<C>> services = new ArrayList<>();
 
         if (!isMonitorDisabled()) {
-            AbstractMonitorService monitorService = constructMonitorService();
+            AbstractMonitorService<C> monitorService = constructMonitorService();
             if (monitorService != null) {
                 lateMonitorService.set(monitorService);
                 services.add(monitorService);
@@ -120,7 +120,7 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
         }
 
         if (!isQueueDisabled()) {
-            AbstractQueueService queueService = constructQueueService();
+            AbstractQueueService<C> queueService = constructQueueService();
             if (queueService != null) {
                 lateQueueService.set(queueService);
                 services.add(queueService);
@@ -128,7 +128,7 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
         }
 
         if (!isSundialDisabled()) {
-            AbstractSundialService sundialService = constructSundialService();
+            AbstractSundialService<C> sundialService = constructSundialService();
             if (sundialService != null) {
                 lateSundialService.set(sundialService);
                 services.add(sundialService);
@@ -136,7 +136,7 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
         }
 
         if (!isReceptionistDisabled()) {
-            AbstractReceptionistService receptionistService = constructReceptionistService();
+            AbstractReceptionistService<C> receptionistService = constructReceptionistService();
             if (receptionistService != null) {
                 lateReceptionistService.set(receptionistService);
                 services.add(receptionistService);
@@ -146,27 +146,27 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
         return services;
     }
 
-    abstract protected @Nullable AbstractMonitorService constructMonitorService();
+    abstract protected @Nullable AbstractMonitorService<C> constructMonitorService();
 
-    abstract protected @Nullable AbstractQueueService constructQueueService();
+    abstract protected @Nullable AbstractQueueService<C> constructQueueService();
 
-    abstract protected @Nullable AbstractSundialService constructSundialService();
+    abstract protected @Nullable AbstractSundialService<C> constructSundialService();
 
-    abstract protected @Nullable AbstractReceptionistService constructReceptionistService();
+    abstract protected @Nullable AbstractReceptionistService<C> constructReceptionistService();
 
-    public AbstractMonitorService getMonitorService() {
+    public AbstractMonitorService<C> getMonitorService() {
         return lateMonitorService.get();
     }
 
-    public AbstractQueueService getQueueService() {
+    public AbstractQueueService<C> getQueueService() {
         return lateQueueService.get();
     }
 
-    public AbstractSundialService getSundialService() {
+    public AbstractSundialService<C> getSundialService() {
         return lateSundialService.get();
     }
 
-    public AbstractReceptionistService getReceptionistService() {
+    public AbstractReceptionistService<C> getReceptionistService() {
         return lateReceptionistService.get();
     }
 

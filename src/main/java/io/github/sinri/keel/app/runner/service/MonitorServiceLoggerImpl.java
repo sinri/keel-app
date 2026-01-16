@@ -1,6 +1,7 @@
 package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.common.monitor.MonitorLog;
+import io.github.sinri.keel.app.runner.ProgramContext;
 import io.github.sinri.keel.core.utils.runtime.CPUTimeResult;
 import io.github.sinri.keel.core.utils.runtime.GCStatResult;
 import io.github.sinri.keel.core.utils.runtime.JVMMemoryResult;
@@ -22,7 +23,7 @@ import java.util.function.BiConsumer;
  * @since 5.0.0
  */
 @NullMarked
-class MonitorServiceLoggerImpl extends AbstractMonitorService {
+class MonitorServiceLoggerImpl<P extends ProgramContext> extends AbstractMonitorService<P> {
     private final long startTimestamp;
     private final @Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier;
     private final LateObject<SpecificLogger<MonitorLog>> lateLogger = new LateObject<>();

@@ -35,6 +35,7 @@ public abstract class Program<C extends ProgramContext> extends CommandLineExecu
     private final C programContext;
 
     public Program() {
+        super();
         this.loggerToStdout = StdoutLoggerFactory.getInstance().createLogger(this.getClass().getName());
         this.programContext = buildProgramContext();
     }
@@ -62,6 +63,8 @@ public abstract class Program<C extends ProgramContext> extends CommandLineExecu
     @Override
     protected final void runWithCommandLine() {
         long startTime = System.currentTimeMillis();
+
+        this.getProgramContext().setParsedCliArguments(getArguments());
 
         JsonifiableSerializer.register();
 

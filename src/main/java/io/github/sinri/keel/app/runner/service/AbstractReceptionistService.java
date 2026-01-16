@@ -1,12 +1,14 @@
 package io.github.sinri.keel.app.runner.service;
 
-import io.github.sinri.keel.app.runner.Application;
 import io.github.sinri.keel.app.runner.CommonApplication;
+import io.github.sinri.keel.app.runner.ProgramContext;
+import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -18,27 +20,29 @@ import java.util.Objects;
  * @since 5.0.0
  */
 @NullMarked
-public abstract class AbstractReceptionistService extends KeelHttpServer implements Service {
+public abstract class AbstractReceptionistService<P extends ProgramContext> extends KeelHttpServer implements Service<P> {
 
-    private final LateObject<Application> lateApplication = new LateObject<>();
+    private final LateObject<P> lateProgramContext = new LateObject<>();
+    private final Logger logger;
 
     public AbstractReceptionistService() {
         super();
-    }
-
-    @Override
-    public Application getApplication() {
-        return lateApplication.get();
-    }
-
-    @Override
-    public final LoggerFactory getLoggerFactory() {
-        return getApplication().getLoggerFactory();
+        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
     }
 
     @Override
     public final Logger getStdoutLogger() {
-        return getApplication().getStdoutLogger();
+        return logger;
+    }
+
+    @Override
+    public final LoggerFactory getLoggerFactory() {
+        return LoggerFactory.getShared();
+    }
+
+    @Override
+    public P getProgramContext() {
+        return lateProgramContext.get();
     }
 
     @Override
@@ -54,13 +58,13 @@ public abstract class AbstractReceptionistService extends KeelHttpServer impleme
      * @see AbstractReceptionistService#getHttpServerPort()
      */
     public @Nullable Integer readConfiguredListenPort() {
-        String s = getApplication().getArguments().readOption(CommonApplication.optionReceptionistPort);
+        String s = getProgramContext().getParsedCliArguments().readOption(CommonApplication.optionReceptionistPort);
         return (s == null ? null : Integer.parseInt(s));
     }
 
     @Override
-    public Future<String> deployMe(Application application) {
-        lateApplication.set(application);
-        return super.deployMe(application.getVertx());
+    public Future<String> deployMe(Vertx vertx, P programContext) {
+        lateProgramContext.set(programContext);
+        return super.deployMe(vertx);
     }
 }

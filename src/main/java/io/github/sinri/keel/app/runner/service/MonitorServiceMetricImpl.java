@@ -1,5 +1,6 @@
 package io.github.sinri.keel.app.runner.service;
 
+import io.github.sinri.keel.app.runner.ProgramContext;
 import io.github.sinri.keel.core.utils.runtime.CPUTimeResult;
 import io.github.sinri.keel.core.utils.runtime.GCStatResult;
 import io.github.sinri.keel.core.utils.runtime.JVMMemoryResult;
@@ -21,7 +22,7 @@ import java.util.function.Function;
  * @since 5.0.0
  */
 @NullMarked
-class MonitorServiceMetricImpl extends AbstractMonitorService {
+class MonitorServiceMetricImpl<P extends ProgramContext> extends AbstractMonitorService<P> {
     public static final String METRIC_SURVIVED = "survived";
     public static final String METRIC_MINOR_GC_COUNT = "minor_gc_count";
     public static final String METRIC_MINOR_GC_TIME = "minor_gc_time";
@@ -50,7 +51,7 @@ class MonitorServiceMetricImpl extends AbstractMonitorService {
 
     @Override
     protected Future<Void> startVerticle() {
-        lateMetricRecorder.set(Objects.requireNonNull(getApplication().getMetricRecorder()));
+        lateMetricRecorder.set(Objects.requireNonNull(getProgramContext().getMetricRecorder()));
         return super.startVerticle();
     }
 

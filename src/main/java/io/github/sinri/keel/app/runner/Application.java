@@ -49,12 +49,12 @@ public abstract class Application<C extends ProgramContext> extends Program<C> {
     protected final Future<Void> launchAsProgram() {
         return prepare()
                 .compose(prepared -> {
-                    List<Service> services = buildServices();
+                    List<Service<C>> services = buildServices();
                     return asyncCallIteratively(
                             services,
                             service -> {
                                 getStdoutLogger().info("For service %s".formatted(service.getClass().getName()));
-                                return service.deployMe(this)
+                                return service.deployMe(getVertx(), getProgramContext())
                                               .compose(deploymentID -> {
                                                   getStdoutLogger().info("Deployed verticle %s with deploymentID %s".formatted(
                                                           service.getClass().getName(), deploymentID
@@ -63,8 +63,8 @@ public abstract class Application<C extends ProgramContext> extends Program<C> {
                                               }, throwable -> {
                                                   getStdoutLogger().error(x -> x.exception(throwable)
                                                                                 .message("Failed to deploy verticle %s"
-                                                                                  .formatted(service.getClass()
-                                                                                                    .getName())));
+                                                                                        .formatted(service.getClass()
+                                                                                                          .getName())));
                                                   if (service.isIndispensableService()) {
                                                       getStdoutLogger().fatal("Indispensable service failed, go die!");
                                                       return Future.failedFuture(throwable);
@@ -81,7 +81,7 @@ public abstract class Application<C extends ProgramContext> extends Program<C> {
     }
 
 
-    abstract protected List<Service> buildServices();
+    abstract protected List<Service<C>> buildServices();
 
     abstract protected Future<Void> prepare();
 }
