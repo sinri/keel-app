@@ -16,7 +16,7 @@ import java.util.List;
  * @since 5.0.0
  */
 @NullMarked
-public abstract class Application extends Program {
+public abstract class Application<C extends ProgramContext> extends Program<C> {
 
     @Override
     protected @Nullable CommandLineArgumentsParser buildCommandLineParser() {

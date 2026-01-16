@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  * @since 5.0.0
  */
 @NullMarked
-public abstract class CommonApplication extends Application {
+public abstract class CommonApplication<C extends ProgramContext> extends Application<C> {
     public static final String optionDisableMonitor = "disableMonitor";
     public static final String optionDisableQueue = "disableQueue";
     public static final String optionDisableSundial = "disableSundial";
