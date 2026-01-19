@@ -7,6 +7,7 @@ import io.github.sinri.keel.base.async.KeelAsyncMixin;
 import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
+import io.github.sinri.keel.base.logger.factory.VertxLoggerDelegateFactoryWorker;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.logger.api.metric.MetricRecorder;
@@ -63,6 +64,8 @@ public abstract class Program<C extends ProgramContext> extends CommandLineExecu
     @Override
     protected final void runWithCommandLine() {
         long startTime = System.currentTimeMillis();
+
+        VertxLoggerDelegateFactoryWorker.ensureProperty();
 
         this.getProgramContext().setParsedCliArguments(getArguments());
 

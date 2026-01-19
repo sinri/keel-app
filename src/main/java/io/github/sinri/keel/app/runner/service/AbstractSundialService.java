@@ -5,7 +5,6 @@ import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.core.servant.sundial.Sundial;
 import io.github.sinri.keel.core.servant.sundial.SundialPlan;
 import io.github.sinri.keel.logger.api.LateObject;
-import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.logger.Logger;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -53,10 +52,6 @@ public abstract class AbstractSundialService<P extends ProgramContext> extends S
                 return plansFetcher.get();
             }
 
-            @Override
-            public LoggerFactory getLoggerFactory() {
-                return LoggerFactory.getShared();
-            }
         };
     }
 

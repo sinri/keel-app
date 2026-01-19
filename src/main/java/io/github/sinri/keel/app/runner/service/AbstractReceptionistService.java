@@ -4,7 +4,6 @@ import io.github.sinri.keel.app.runner.CommonApplication;
 import io.github.sinri.keel.app.runner.ProgramContext;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.logger.api.LateObject;
-import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.vertx.core.Future;
@@ -35,10 +34,6 @@ public abstract class AbstractReceptionistService<P extends ProgramContext> exte
         return logger;
     }
 
-    @Override
-    public final LoggerFactory getLoggerFactory() {
-        return LoggerFactory.getShared();
-    }
 
     @Override
     public P getProgramContext() {
