@@ -60,8 +60,4 @@ class WrappedService<P extends ProgramContext> extends KeelVerticleBase implemen
                        });
     }
 
-    @Override
-    public Logger getStdoutLogger() {
-        return logger;
-    }
 }

@@ -2,9 +2,7 @@ package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.CommonApplication;
 import io.github.sinri.keel.app.runner.ProgramContext;
-import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.logger.api.LateObject;
-import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -22,17 +20,17 @@ import java.util.Objects;
 public abstract class AbstractReceptionistService<P extends ProgramContext> extends KeelHttpServer implements Service<P> {
 
     private final LateObject<P> lateProgramContext = new LateObject<>();
-    private final Logger logger;
+    //    private final Logger logger;
 
     public AbstractReceptionistService() {
         super();
-        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
+        //        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
     }
 
-    @Override
-    public final Logger getStdoutLogger() {
-        return logger;
-    }
+    //    @Override
+    //    public final Logger getStdoutLogger() {
+    //        return logger;
+    //    }
 
 
     @Override

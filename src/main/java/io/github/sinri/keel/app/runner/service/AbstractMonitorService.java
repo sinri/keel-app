@@ -1,12 +1,10 @@
 package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.ProgramContext;
-import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.base.verticles.KeelVerticleBase;
 import io.github.sinri.keel.core.utils.runtime.KeelRuntimeMonitor;
 import io.github.sinri.keel.core.utils.runtime.MonitorSnapshot;
 import io.github.sinri.keel.logger.api.LateObject;
-import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.logger.api.metric.MetricRecord;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -30,11 +28,11 @@ import java.util.function.Function;
 @NullMarked
 public abstract class AbstractMonitorService<P extends ProgramContext> extends KeelVerticleBase implements Service<P> {
     private final LateObject<P> lateProgramContext = new LateObject<>();
-    private final Logger logger;
+    //    private final Logger logger;
 
     public AbstractMonitorService() {
         super();
-        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
+        //        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
     }
 
     public static <P extends ProgramContext> AbstractMonitorService<P> throughLogger(@Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier) {
@@ -67,8 +65,8 @@ public abstract class AbstractMonitorService<P extends ProgramContext> extends K
                 .setThreadingModel(ThreadingModel.WORKER));
     }
 
-    @Override
-    public final Logger getStdoutLogger() {
-        return logger;
-    }
+    //    @Override
+    //    public final Logger getStdoutLogger() {
+    //        return logger;
+    //    }
 }

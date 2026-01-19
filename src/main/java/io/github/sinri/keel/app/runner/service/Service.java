@@ -1,6 +1,5 @@
 package io.github.sinri.keel.app.runner.service;
 
-import io.github.sinri.keel.app.common.AppRecordingMixin;
 import io.github.sinri.keel.app.runner.ProgramContext;
 import io.github.sinri.keel.base.VertxHolder;
 import io.github.sinri.keel.base.async.KeelAsyncMixin;
@@ -17,7 +16,7 @@ import java.util.function.Function;
  * @since 5.0.0
  */
 @NullMarked
-public interface Service<P extends ProgramContext> extends AppRecordingMixin, VertxHolder, KeelAsyncMixin, Deployable {
+public interface Service<P extends ProgramContext> extends VertxHolder, KeelAsyncMixin, Deployable {
     static <P extends ProgramContext> Service<P> wrap(Function<Service<P>, Future<Void>> anything) {
         return new WrappedService<>(anything);
     }

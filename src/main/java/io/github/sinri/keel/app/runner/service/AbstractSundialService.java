@@ -1,11 +1,9 @@
 package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.ProgramContext;
-import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.core.servant.sundial.Sundial;
 import io.github.sinri.keel.core.servant.sundial.SundialPlan;
 import io.github.sinri.keel.logger.api.LateObject;
-import io.github.sinri.keel.logger.api.logger.Logger;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import org.jspecify.annotations.NullMarked;
@@ -25,11 +23,11 @@ import java.util.function.Supplier;
 public abstract class AbstractSundialService<P extends ProgramContext> extends Sundial implements Service<P> {
 
     private final LateObject<P> lateProgramContext = new LateObject<>();
-    private final Logger logger;
+    //    private final Logger logger;
 
     public AbstractSundialService() {
         super();
-        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
+        //        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
     }
 
     public static <P extends ProgramContext> AbstractSundialService<P> wrap(
@@ -60,10 +58,10 @@ public abstract class AbstractSundialService<P extends ProgramContext> extends S
         return lateProgramContext.get();
     }
 
-    @Override
-    public final Logger getStdoutLogger() {
-        return logger;
-    }
+    //    @Override
+    //    public final Logger getStdoutLogger() {
+    //        return logger;
+    //    }
 
     @Override
     public Future<String> deployMe(Vertx vertx, P programContext) {
