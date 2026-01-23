@@ -1,4 +1,4 @@
-module keel.app.main {
+module io.github.sinri.keel.app {
     requires transitive io.github.sinri.keel.base;
     requires transitive io.github.sinri.keel.core;
     requires transitive io.github.sinri.keel.logger.api;

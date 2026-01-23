@@ -3,6 +3,7 @@ package io.github.sinri.keel.app.runner;
 import io.github.sinri.keel.app.cli.CommandLineOption;
 import io.github.sinri.keel.app.runner.service.*;
 import io.github.sinri.keel.base.configuration.ConfigElement;
+import io.github.sinri.keel.base.configuration.NotConfiguredException;
 import io.github.sinri.keel.integration.aliyun.sls.AliyunSlsConfigElement;
 import io.github.sinri.keel.integration.aliyun.sls.SlsLoggerFactory;
 import io.github.sinri.keel.logger.api.LateObject;
@@ -96,7 +97,13 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
 
     @Override
     protected Future<LoggerFactory> buildLoggerFactory() {
-        AliyunSlsConfigElement aliyunSlsConfigElement = AliyunSlsConfigElement.forSls(ConfigElement.root());
+        AliyunSlsConfigElement aliyunSlsConfigElement;
+        try {
+            aliyunSlsConfigElement = AliyunSlsConfigElement.forSls(ConfigElement.root());
+        } catch (NotConfiguredException e) {
+            getStdoutLogger().warning("Aliyun Sls Config Not Found.");
+            aliyunSlsConfigElement = null;
+        }
         SlsLoggerFactory slsLoggerFactory = new SlsLoggerFactory(aliyunSlsConfigElement);
         return slsLoggerFactory.deployMe(getVertx(), new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER))
                                .compose(v -> {
