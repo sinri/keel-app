@@ -1,15 +1,15 @@
 package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.ProgramContext;
-import io.github.sinri.keel.base.verticles.KeelVerticleBase;
+import io.github.sinri.keel.base.async.Keel;
 import io.github.sinri.keel.core.utils.runtime.KeelRuntimeMonitor;
 import io.github.sinri.keel.core.utils.runtime.MonitorSnapshot;
 import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.metric.MetricRecord;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.ThreadingModel;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -26,13 +26,12 @@ import java.util.function.Function;
  * @since 5.0.0
  */
 @NullMarked
-public abstract class AbstractMonitorService<P extends ProgramContext> extends KeelVerticleBase implements Service<P> {
+public abstract class AbstractMonitorService<P extends ProgramContext> extends KeelRuntimeMonitor implements Service<P> {
     private final LateObject<P> lateProgramContext = new LateObject<>();
-    //    private final Logger logger;
+    private final LateObject<Handler<MonitorSnapshot>> lateHandler = new LateObject<>();
 
     public AbstractMonitorService() {
         super();
-        //        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
     }
 
     public static <P extends ProgramContext> AbstractMonitorService<P> throughLogger(@Nullable BiConsumer<MonitorSnapshot, JsonObject> specialSnapshotModifier) {
@@ -50,23 +49,26 @@ public abstract class AbstractMonitorService<P extends ProgramContext> extends K
 
     @Override
     protected Future<Void> startVerticle() {
-        new KeelRuntimeMonitor(getVertx()).startRuntimeMonitor(getInterval(), this::handleMonitorSnapshot);
-        return Future.succeededFuture();
+        return super.startVerticle()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    });
     }
 
+    @Override
     abstract protected long getInterval();
+
+    @Override
+    protected final Handler<MonitorSnapshot> getHandler() {
+        return lateHandler.ensure(() -> (Handler<MonitorSnapshot>) this::handleMonitorSnapshot);
+    }
 
     abstract protected void handleMonitorSnapshot(MonitorSnapshot monitorSnapshot);
 
     @Override
-    public Future<String> deployMe(Vertx vertx, P programContext) {
+    public Future<String> deployMe(Keel keel, P programContext) {
         lateProgramContext.set(programContext);
-        return deployMe(vertx, new DeploymentOptions()
+        return deployMe(keel, new DeploymentOptions()
                 .setThreadingModel(ThreadingModel.WORKER));
     }
-
-    //    @Override
-    //    public final Logger getStdoutLogger() {
-    //        return logger;
-    //    }
 }

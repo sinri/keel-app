@@ -105,7 +105,7 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
             aliyunSlsConfigElement = null;
         }
         SlsLoggerFactory slsLoggerFactory = new SlsLoggerFactory(aliyunSlsConfigElement);
-        return slsLoggerFactory.deployMe(getVertx(), new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER))
+        return slsLoggerFactory.deployMe(getKeel(), new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER))
                                .compose(v -> {
                                    return Future.succeededFuture(slsLoggerFactory);
                                }, throwable -> {

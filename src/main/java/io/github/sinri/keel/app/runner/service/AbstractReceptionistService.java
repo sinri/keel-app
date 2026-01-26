@@ -2,10 +2,10 @@ package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.CommonApplication;
 import io.github.sinri.keel.app.runner.ProgramContext;
+import io.github.sinri.keel.base.async.Keel;
 import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -20,17 +20,10 @@ import java.util.Objects;
 public abstract class AbstractReceptionistService<P extends ProgramContext> extends KeelHttpServer implements Service<P> {
 
     private final LateObject<P> lateProgramContext = new LateObject<>();
-    //    private final Logger logger;
 
     public AbstractReceptionistService() {
         super();
-        //        this.logger = StdoutLoggerFactory.getInstance().createLogger(getClass().getName());
     }
-
-    //    @Override
-    //    public final Logger getStdoutLogger() {
-    //        return logger;
-    //    }
 
 
     @Override
@@ -56,8 +49,8 @@ public abstract class AbstractReceptionistService<P extends ProgramContext> exte
     }
 
     @Override
-    public Future<String> deployMe(Vertx vertx, P programContext) {
+    public Future<String> deployMe(Keel keel, P programContext) {
         lateProgramContext.set(programContext);
-        return super.deployMe(vertx);
+        return super.deployMe(keel);
     }
 }

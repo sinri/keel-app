@@ -1,11 +1,9 @@
 package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.ProgramContext;
-import io.github.sinri.keel.base.VertxHolder;
-import io.github.sinri.keel.base.async.KeelAsyncMixin;
-import io.vertx.core.Deployable;
+import io.github.sinri.keel.base.async.Keel;
+import io.github.sinri.keel.base.verticles.KeelVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.function.Function;
@@ -16,7 +14,7 @@ import java.util.function.Function;
  * @since 5.0.0
  */
 @NullMarked
-public interface Service<P extends ProgramContext> extends VertxHolder, KeelAsyncMixin, Deployable {
+public interface Service<P extends ProgramContext> extends KeelVerticle {
     static <P extends ProgramContext> Service<P> wrap(Function<Service<P>, Future<Void>> anything) {
         return new WrappedService<>(anything);
     }
@@ -26,7 +24,7 @@ public interface Service<P extends ProgramContext> extends VertxHolder, KeelAsyn
      */
     P getProgramContext();
 
-    Future<String> deployMe(Vertx vertx, P programContext);
+    Future<String> deployMe(Keel keel, P programContext);
 
     /**
      * 注明本服务是否为不可或缺的，如果是，则当部署失败是触发程序启动异常。

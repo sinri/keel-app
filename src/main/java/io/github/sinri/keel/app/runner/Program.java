@@ -2,8 +2,7 @@ package io.github.sinri.keel.app.runner;
 
 import io.github.sinri.keel.app.cli.CommandLineExecutable;
 import io.github.sinri.keel.app.common.AppRecordingMixin;
-import io.github.sinri.keel.base.SharedVertxStorage;
-import io.github.sinri.keel.base.async.KeelAsyncMixin;
+import io.github.sinri.keel.base.async.Keel;
 import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
@@ -27,7 +26,7 @@ import java.io.IOException;
  * @since 5.0.0
  */
 @NullMarked
-public abstract class Program<C extends ProgramContext> extends CommandLineExecutable implements AppRecordingMixin, KeelAsyncMixin {
+public abstract class Program<C extends ProgramContext> extends CommandLineExecutable implements AppRecordingMixin {
     /**
      * 面向标准输出的日志记录器。
      */
@@ -86,12 +85,12 @@ public abstract class Program<C extends ProgramContext> extends CommandLineExecu
                   if (clusterManager == null) {
                       // NOT SUPPORT CLUSTER MODE
                       Vertx tempVertx = Vertx.builder().with(vertxOptions).build();
-                      SharedVertxStorage.set(tempVertx);
+                      Keel.share(tempVertx);
                       return Future.succeededFuture();
                   } else {
                       return Vertx.builder().withClusterManager(clusterManager).with(vertxOptions).buildClustered()
-                                  .compose(built -> {
-                                      SharedVertxStorage.set(built);
+                                  .compose(clusteredVertx -> {
+                                      Keel.share(clusteredVertx);
                                       return Future.succeededFuture();
                                   });
                   }
@@ -197,7 +196,7 @@ public abstract class Program<C extends ProgramContext> extends CommandLineExecu
         // do nothing by default, or you may need a latch to keep the main process alive.
     }
 
-    public final Vertx getVertx() {
-        return SharedVertxStorage.get();
+    public final Keel getKeel() {
+        return Keel.shared();
     }
 }

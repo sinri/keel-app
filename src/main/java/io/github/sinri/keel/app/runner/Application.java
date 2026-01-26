@@ -50,11 +50,11 @@ public abstract class Application<C extends ProgramContext> extends Program<C> {
         return prepare()
                 .compose(prepared -> {
                     List<Service<C>> services = buildServices();
-                    return asyncCallIteratively(
+                    return getKeel().asyncCallIteratively(
                             services,
                             service -> {
                                 getStdoutLogger().info("For service %s".formatted(service.getClass().getName()));
-                                return service.deployMe(getVertx(), getProgramContext())
+                                return service.deployMe(getKeel(), getProgramContext())
                                               .compose(deploymentID -> {
                                                   getStdoutLogger().info("Deployed verticle %s with deploymentID %s".formatted(
                                                           service.getClass().getName(), deploymentID

@@ -1,13 +1,13 @@
 package io.github.sinri.keel.app.runner.service;
 
 import io.github.sinri.keel.app.runner.ProgramContext;
+import io.github.sinri.keel.base.async.Keel;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.base.verticles.KeelVerticleBase;
 import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.logger.Logger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.function.Function;
@@ -19,6 +19,7 @@ import java.util.function.Function;
  *
  * @since 5.0.0
  */
+@Deprecated(since = "5.0.0")
 @NullMarked
 class WrappedService<P extends ProgramContext> extends KeelVerticleBase implements Service<P> {
     private final LateObject<P> lateProgramContext = new LateObject<>();
@@ -38,9 +39,9 @@ class WrappedService<P extends ProgramContext> extends KeelVerticleBase implemen
     }
 
     @Override
-    public Future<String> deployMe(Vertx vertx, P programContext) {
+    public Future<String> deployMe(Keel keel, P programContext) {
         lateProgramContext.set(programContext);
-        return deployMe(vertx, new DeploymentOptions());
+        return deployMe(keel, new DeploymentOptions());
     }
 
     @Override
@@ -51,10 +52,10 @@ class WrappedService<P extends ProgramContext> extends KeelVerticleBase implemen
                                logger.error("Failed to start wrapped service: " + ar.cause().getMessage());
                                if (this.isIndispensableService()) {
                                    logger.fatal("Indispensable service failed to start, shutting down the application.");
-                                   vertx.close();
+                                   getKeel().close();
                                }
                            }
-                           getVertx().setTimer(100, id -> {
+                           getKeel().setTimer(100, id -> {
                                this.undeployMe();
                            });
                        });
