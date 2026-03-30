@@ -15,6 +15,7 @@ import java.util.function.Function;
  */
 @NullMarked
 public interface Service<P extends ProgramContext> extends KeelVerticle {
+    @Deprecated(since = "5.0.1",forRemoval = true)
     static <P extends ProgramContext> Service<P> wrap(Function<Service<P>, Future<Void>> anything) {
         return new WrappedService<>(anything);
     }

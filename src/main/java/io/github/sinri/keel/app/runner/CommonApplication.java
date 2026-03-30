@@ -16,7 +16,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * 基于依次部署给定的 Verticles 运行的应用程序，默认提供了常见的服务封装。
@@ -63,9 +62,12 @@ public abstract class CommonApplication<C extends ProgramContext> extends Applic
                 new CommandLineOption()
                         .alias(optionReceptionistPort)
                         .setValueValidator(s -> {
-                            return Pattern.compile("^[1-9][0-9]+$")
-                                          .matcher(s)
-                                          .matches();
+                            try {
+                                int port = Integer.parseInt(s);
+                                return port >= 1 && port <= 65535;
+                            } catch (NumberFormatException e) {
+                                return false;
+                            }
                         })
                         .description("Port for the receptionist"),
                 new CommandLineOption()

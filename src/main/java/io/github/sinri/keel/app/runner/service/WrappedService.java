@@ -19,7 +19,7 @@ import java.util.function.Function;
  *
  * @since 5.0.0
  */
-@Deprecated(since = "5.0.0")
+@Deprecated(since = "5.0.0",forRemoval = true)
 @NullMarked
 class WrappedService<P extends ProgramContext> extends KeelVerticleBase implements Service<P> {
     private final LateObject<P> lateProgramContext = new LateObject<>();
