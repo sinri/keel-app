@@ -87,7 +87,7 @@ public class CommandLineOption {
      */
     public static String validatedAlias(String alias) {
         if (!VALID_ALIAS_PATTERN.matcher(alias).matches()) {
-            throw new IllegalArgumentException("Alias cannot be null");
+            throw new IllegalArgumentException("Alias does not match the required pattern: " + VALID_ALIAS_PATTERN.pattern());
         }
         return alias;
     }

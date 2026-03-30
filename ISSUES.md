@@ -98,8 +98,8 @@
 - **现象**：`CommandLineOption.validatedAlias` 在模式不匹配时抛出消息 "Alias cannot be null"。
 - **影响**：错误提示与真实原因不符，增加排错成本。
 - **位置**：`CommandLineOption.java` 第 88–92 行
-- **建议**：修改错误消息为 "Alias does not match required pattern" 或类似表述。
-- [ ] 待处理
+- **修复**：错误消息改为包含实际的模式信息。
+- [x] 已修复
 
 ### C-03 CLI：KeelVertxApplicationHooks 配置类型丢失
 
@@ -130,7 +130,7 @@
 | 优先级 | 数量 | Issue IDs |
 |--------|------|-----------|
 | P1     | 1    | T-01 |
-| P2     | 4    | B-03, A-02, C-02, C-03 |
+| P2     | 3    | B-03, A-02, C-03 |
 | P3     | 1    | M-01 |
-| 已关闭   | 6    | B-01, A-01, R-01, B-02, R-02（不予处理）; C-01（已修复） |
+| 已关闭   | 7    | B-01, A-01, R-01, B-02, R-02（不予处理）; C-01, C-02（已修复） |
 | **合计** | **12** | |
