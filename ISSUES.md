@@ -40,8 +40,8 @@
 - **现象**：`tasks.test { include("...*UnitTest.class") }`，但 `src/test/java` 无测试类。
 - **影响**：CI / 本地 `test` 任务几乎不执行有效回归。
 - **位置**：`build.gradle.kts` 第 97–101 行
-- **建议**：补充 CLI 解析、`Application` 部署顺序等单元测试，或放宽 `include` 与命名约定。
-- [ ] 待处理
+- **修复**：新增 `CommandLineParserUnitTest`，覆盖别名校验、选项/标志/参数解析、值校验、错误情况等 18 个测试用例。
+- [x] 已修复
 
 ---
 
@@ -62,8 +62,8 @@
 - **现象**：仓库根目录无 `README*`。
 - **影响**：集成方式、必需 Gradle 属性、签名与 JReleaser 环境缺少对外说明。
 - **位置**：仓库根目录
-- **建议**：补充 README，说明构建步骤与必需配置。
-- [ ] 待处理
+- **修复**：新增 `README.md`，包含项目简介、特性、依赖引入、最简示例、构建与测试说明。
+- [x] 已修复
 
 ### A-02 架构：CommonApplication 类注释与实现不一致
 
@@ -71,8 +71,8 @@
 - **现象**：类注释描述启动顺序含「业务初始化服务」，`buildServices()` 仅装配 Monitor / Queue / Sundial / Receptionist。
 - **影响**：文档与实现不一致，易误导二次开发者。
 - **位置**：`CommonApplication.java` 第 21–31 行与第 117–153 行
-- **建议**：修正类注释，使其与实际实现保持一致。
-- [ ] 待处理
+- **修复**：移除注释中不存在的「业务初始化服务」，修正为实际的四个服务并标注英文名称。
+- [x] 已修复
 
 ### R-02 可靠性：WrappedService 生命周期异常
 
@@ -105,10 +105,10 @@
 
 - **分类**：CLI 与 API 质量
 - **现象**：`KeelVertxApplicationHooks` 将非嵌套 `JsonObject` 的值一律 `toString()`。
-- **影响**：数组 / 布尔 / 数字等类型与结构丢失，配置合并可能不符合预期。
+- **影响**：`ConfigElement` 设计为纯字符串值存储，`toString()` 行为符合设计；数字/布尔值可通过 `readInteger`/`readBoolean` 等方法正确还原；数组不在 `ConfigElement` 的支持范围内。
 - **位置**：`KeelVertxApplicationHooks.java` 第 26–37、44–56 行
-- **建议**：按值类型分别处理，保留原始 JSON 类型。
-- [ ] 待处理
+- **处理**：完善了 `transformJsonObjectToConfigElements` 的 javadoc，明确了转换行为。
+- [x] 已处理（补充文档）
 
 ---
 
@@ -118,10 +118,10 @@
 
 - **分类**：其他
 - **现象**：`module-info.java` 中大量 `requires transitive`（Vert.x、Jackson、CommonMark 等）。
-- **影响**：模块化消费者需理解传递模块边界与冲突风险。
+- **影响**：`keel-app` 定位为一站式应用框架入口，`requires transitive` 是有意为之，使下游消费者无需逐一声明依赖。
 - **位置**：`module-info.java`
-- **建议**：评估哪些 `requires transitive` 可降级为 `requires`，减少传递暴露面。
-- [ ] 待处理
+- **建议**：暂不处理。
+- [x] 不予处理（设计意图如此）
 
 ---
 
@@ -129,8 +129,8 @@
 
 | 优先级 | 数量 | Issue IDs |
 |--------|------|-----------|
-| P1     | 1    | T-01 |
-| P2     | 3    | B-03, A-02, C-03 |
-| P3     | 1    | M-01 |
-| 已关闭   | 7    | B-01, A-01, R-01, B-02, R-02（不予处理）; C-01, C-02（已修复） |
+| P1     | 0    | |
+| P2     | 0    | |
+| P3     | 0    | |
+| 已关闭   | 12   | B-01, A-01, R-01, B-02, R-02, M-01（不予处理）; T-01, C-01, C-02, A-02, B-03（已修复）; C-03（补充文档） |
 | **合计** | **12** | |

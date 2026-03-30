@@ -20,6 +20,18 @@ import java.util.List;
  */
 @NullMarked
 public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
+    /**
+     * 将 {@link JsonObject} 的顶层条目转换为 {@link ConfigElement} 列表。
+     * <p>
+     * 对于每个条目：
+     * <ul>
+     *     <li>若值为嵌套 {@link JsonObject}，则递归转换为子 {@link ConfigElement} 树；</li>
+     *     <li>否则，将非 null 值通过 {@code toString()} 存储为字符串（与 {@link ConfigElement} 的纯字符串值设计一致）。</li>
+     * </ul>
+     *
+     * @param jsonObject 待转换的 JSON 对象
+     * @return 与顶层 key 一一对应的 {@link ConfigElement} 列表
+     */
     private static List<ConfigElement> transformJsonObjectToConfigElements(JsonObject jsonObject) {
         List<ConfigElement> list = new ArrayList<>();
 
