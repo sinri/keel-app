@@ -6,8 +6,6 @@ import io.github.sinri.keel.base.verticles.KeelVerticle;
 import io.vertx.core.Future;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.function.Function;
-
 /**
  * 在应用体系下运行的服务的通用接口。
  *
@@ -15,10 +13,6 @@ import java.util.function.Function;
  */
 @NullMarked
 public interface Service<P extends ProgramContext> extends KeelVerticle {
-    @Deprecated(since = "5.0.1",forRemoval = true)
-    static <P extends ProgramContext> Service<P> wrap(Function<Service<P>, Future<Void>> anything) {
-        return new WrappedService<>(anything);
-    }
 
     /**
      * 部署所在的应用的上下文实例，仅在部署后可获取。
