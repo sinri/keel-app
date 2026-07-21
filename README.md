@@ -60,6 +60,9 @@ public class MyApplication extends Application<MyContext> {
 }
 ```
 
+`ProgramContext` 会在命令行参数解析完成后、程序启动流水线开始时构建一次。请勿在调用 `launch` 前访问
+`getProgramContext()`；此时上下文尚未初始化。
+
 ## 构建
 
 ```bash

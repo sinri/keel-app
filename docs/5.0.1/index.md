@@ -76,7 +76,7 @@ static void main(String[] args) {
 
 你需要实现：
 
-- `buildProgramContext()`：构造程序上下文
+- `buildProgramContext()`：构造程序上下文；在命令行参数解析完成后、程序启动流水线开始时调用一次
 - `launchAsProgram()`：在 Vert.x 与 Keel 就绪后执行的主体逻辑
 
 可选覆盖：
@@ -91,8 +91,10 @@ static void main(String[] args) {
 - `affix()`：异步链在后台跑完后，主线程收尾（默认空；若进程需常驻可在此阻塞或挂接 CountDownLatch 等）
 - `handleError(Throwable)`：致命错误处理，默认打日志并 `System.exit(1)`
 
-启动顺序（概念上）：初始化日志委派 → 将已解析 CLI 写入 `ProgramContext` → 注册 JSON 序列化 → 本地配置 → 创建/共享 `Vertx` 与
+启动顺序（概念上）：初始化日志委派 → 构建 `ProgramContext` → 将已解析 CLI 写入 `ProgramContext` → 注册 JSON 序列化 → 本地配置 → 创建/共享 `Vertx` 与
 `Keel` → 远程配置 → `LoggerFactory` → 可选 `MetricRecorder` → `launchAsProgram()`。
+
+在调用 `launch` 前访问 `getProgramContext()` 会因上下文尚未初始化而抛出 `IllegalStateException`。
 
 ### 6.2 `Application<C extends ProgramContext>` extends `Program<C>`
 

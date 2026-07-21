@@ -7,6 +7,7 @@ import io.github.sinri.keel.base.configuration.ConfigElement;
 import io.github.sinri.keel.base.json.JsonifiableSerializer;
 import io.github.sinri.keel.base.logger.factory.StdoutLoggerFactory;
 import io.github.sinri.keel.base.logger.factory.VertxLoggerDelegateFactoryWorker;
+import io.github.sinri.keel.logger.api.LateObject;
 import io.github.sinri.keel.logger.api.factory.LoggerFactory;
 import io.github.sinri.keel.logger.api.logger.Logger;
 import io.github.sinri.keel.logger.api.metric.MetricRecorder;
@@ -32,23 +33,22 @@ public abstract class Program<C extends ProgramContext> extends CommandLineExecu
      */
     private final Logger loggerToStdout;
 
-    private final C programContext;
+    private final LateObject<C> lateProgramContext = new LateObject<>();
 
     public Program() {
         super();
         this.loggerToStdout = StdoutLoggerFactory.getInstance().createLogger(this.getClass().getName());
-        this.programContext = buildProgramContext();
     }
 
     abstract protected C buildProgramContext();
 
     public final C getProgramContext() {
-        return programContext;
+        return lateProgramContext.get();
     }
 
     @Override
     public @Nullable MetricRecorder getMetricRecorder() {
-        return programContext.getMetricRecorder();
+        return getProgramContext().getMetricRecorder();
     }
 
     @Override
@@ -66,6 +66,7 @@ public abstract class Program<C extends ProgramContext> extends CommandLineExecu
 
         VertxLoggerDelegateFactoryWorker.ensureProperty();
 
+        lateProgramContext.set(buildProgramContext());
         this.getProgramContext().setParsedCliArguments(getArguments());
 
         JsonifiableSerializer.register();
@@ -122,7 +123,7 @@ public abstract class Program<C extends ProgramContext> extends CommandLineExecu
                               if (builtMetricRecorder != null) {
                                   getStdoutLogger().info("BUILT METRIC RECORDER: " + builtMetricRecorder.getClass()
                                                                                                         .getName());
-                                  this.programContext.setMetricRecorder(builtMetricRecorder);
+                                  this.getProgramContext().setMetricRecorder(builtMetricRecorder);
                                   getStdoutLogger().info("CUSTOM METRIC RECORDER LOADED");
                               }
                               return Future.succeededFuture();
