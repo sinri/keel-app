@@ -186,6 +186,37 @@ class CommandLineParserUnitTest {
                 () -> parser.addOption(new CommandLineOption()));
     }
 
+    @Test
+    void addOption_noAliasFailure_allowsRetryAfterAddingAlias() throws CommandLineArgumentsParseError {
+        var parser = CommandLineArgumentsParser.create();
+        var option = new CommandLineOption().flag();
+
+        assertThrows(CommandLineArgumentsDefinitionError.class, () -> parser.addOption(option));
+
+        option.alias("verbose");
+        parser.addOption(option);
+        assertTrue(parser.parse(new String[]{"--verbose"}).readFlag("verbose"));
+    }
+
+    @Test
+    void addOption_duplicateAliasFailure_doesNotLeavePartialState() throws CommandLineArgumentsParseError {
+        var parser = CommandLineArgumentsParser.create();
+        parser.addOption(new CommandLineOption().alias("existing").flag());
+
+        var rejectedOption = new CommandLineOption()
+                .alias("available")
+                .alias("existing")
+                .flag();
+        assertThrows(CommandLineArgumentsDefinitionError.class, () -> parser.addOption(rejectedOption));
+
+        assertThrows(CommandLineArgumentsParseError.class,
+                () -> parser.parse(new String[]{"--available"}));
+        assertTrue(parser.parse(new String[]{"--existing"}).readFlag("existing"));
+
+        parser.addOption(new CommandLineOption().alias("available").flag());
+        assertTrue(parser.parse(new String[]{"--available"}).readFlag("available"));
+    }
+
     // --- Parameter index boundary ---
 
     @Test

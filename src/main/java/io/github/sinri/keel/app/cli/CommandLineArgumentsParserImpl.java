@@ -22,7 +22,6 @@ class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
         if (optionMap.containsKey(option.id())) {
             throw new CommandLineArgumentsDefinitionError("Duplicate named argument definition id: " + option.id());
         }
-        optionMap.put(option.id(), option);
 
         Set<String> aliasSet = option.getAliasSet();
         if (aliasSet.isEmpty()) {
@@ -34,8 +33,10 @@ class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
             if (nameToOptionIdMap.containsKey(alias)) {
                 throw new CommandLineArgumentsDefinitionError("Alias cannot duplicate: " + alias);
             }
-            nameToOptionIdMap.put(alias, option.id());
         }
+
+        optionMap.put(option.id(), option);
+        aliasSet.forEach(alias -> nameToOptionIdMap.put(alias, option.id()));
     }
 
 
