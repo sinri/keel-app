@@ -35,7 +35,24 @@ dependencies {
 ### 最简示例
 
 ```java
+import io.github.sinri.keel.app.runner.AbstractProgramContext;
+import io.github.sinri.keel.app.runner.Application;
+import io.github.sinri.keel.app.runner.service.Service;
+import io.vertx.core.Future;
+
+import java.util.List;
+
 public class MyApplication extends Application<MyContext> {
+
+    @Override
+    protected String buildCliName() {
+        return "my-application";
+    }
+
+    @Override
+    protected String buildCliDescription() {
+        return "My Keel application";
+    }
 
     @Override
     protected MyContext buildProgramContext() {
@@ -55,8 +72,11 @@ public class MyApplication extends Application<MyContext> {
     }
 
     public static void main(String[] args) {
-        new MyApplication().runWithCommandLine(args);
+        new MyApplication().launch(args);
     }
+}
+
+class MyContext extends AbstractProgramContext {
 }
 ```
 

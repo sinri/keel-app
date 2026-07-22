@@ -1,11 +1,11 @@
-# Keel-App 5.0.1 用户使用文档
+# Keel-App 5.0.3 用户使用文档
 
 本文档面向在业务项目中集成 **Keel-App** 的开发者，说明如何引入依赖、启动应用、扩展命令行与内置服务，以及与 Vert.x 启动器的集成方式。
 
 ## 1. 文档与版本说明
 
-- 文档目录 `docs/5.0.1/` 对应 **Keel-App 5.0.x** 用户指南；具体发行版请以 Maven 坐标中的 `version` 为准（例如 `5.0.1` 或
-  `5.0.1-SNAPSHOT`）。
+- 文档目录 `docs/5.0.3/` 对应 **Keel-App 5.0.3** 用户指南；开发中的同版本构建可能使用
+  `5.0.3-SNAPSHOT`。
 - Keel-App 是 [Keel](https://github.com/sinri/keel) 的应用封装层，基于 **Vert.x 5**，要求 **Java 17+**。
 
 ## 2. 产品概述
@@ -31,7 +31,7 @@ Keel-App 提供：
 
 ```kotlin
 dependencies {
-    implementation("io.github.sinri:keel-app:5.0.1")
+    implementation("io.github.sinri:keel-app:5.0.3")
 }
 ```
 
@@ -42,7 +42,7 @@ dependencies {
 <dependency>
     <groupId>io.github.sinri</groupId>
     <artifactId>keel-app</artifactId>
-    <version>5.0.1</version>
+    <version>5.0.3</version>
 </dependency>
 ```
 
@@ -56,14 +56,53 @@ Keel-App 会传递引入 Vert.x（含 `vertx-launcher-application`）、Keel 核
 
 ## 5. 程序入口与启动方式
 
-可执行程序应通过 **`launch(String[] args)`** 进入框架（定义在 `AppLifeCycleMixin` 中，由 `CommandLineExecutable` 实现）。*
-*不要**直接调用受保护的 `runWithCommandLine()`。
+可执行程序应通过 **`launch(String[] args)`** 进入框架（定义在 `AppLifeCycleMixin` 中，由 `CommandLineExecutable` 实现）。
+**不要**直接调用受保护的 `runWithCommandLine()`。
 
-典型 `main` 写法：
+一个可编译的最简示例：
 
 ```java
-static void main(String[] args) {
-    new MyApplication().launch(a
+import io.github.sinri.keel.app.runner.AbstractProgramContext;
+import io.github.sinri.keel.app.runner.Application;
+import io.github.sinri.keel.app.runner.service.Service;
+import io.vertx.core.Future;
+
+import java.util.List;
+
+public class MyApplication extends Application<MyContext> {
+
+    @Override
+    protected String buildCliName() {
+        return "my-application";
+    }
+
+    @Override
+    protected String buildCliDescription() {
+        return "My Keel application";
+    }
+
+    @Override
+    protected MyContext buildProgramContext() {
+        return new MyContext();
+    }
+
+    @Override
+    protected Future<Void> prepare() {
+        return Future.succeededFuture();
+    }
+
+    @Override
+    protected List<Service<MyContext>> buildServices() {
+        return List.of();
+    }
+
+    public static void main(String[] args) {
+        new MyApplication().launch(args);
+    }
+}
+
+class MyContext extends AbstractProgramContext {
+}
 ```
 
 `launch` 会完成：构建（若有）命令行解析器 → 解析参数 → 调用子类的启动流水线。
@@ -131,9 +170,6 @@ static void main(String[] args) {
 
 - `deployMe(Keel keel, P programContext)`：部署本服务，并应保存 `programContext` 供后续使用
 - `getProgramContext()`：部署后可访问上下文
-
-**弃用说明（5.0.1）**：`Service.wrap(...)` 已标记为 `@Deprecated(since = "5.0.1", forRemoval = true)`，新代码请使用显式
-`Service` 实现类，避免依赖该方法。
 
 内置抽象基类：
 
@@ -208,8 +244,8 @@ java -jar app.jar --disableSundial --receptionistPort 8080
 
 ## 12. 与 Vert.x Application Launcher 集成
 
-若使用 [Vert.x Application Launcher](https://vertx.io/docs/vertx-launcher-application/java/)，可实现 *
-*`KeelVertxApplicationHooks`**（扩展 `VertxApplicationHooks`）：
+若使用 [Vert.x Application Launcher](https://vertx.io/docs/vertx-launcher-application/java/)，可实现
+**`KeelVertxApplicationHooks`**（扩展 `VertxApplicationHooks`）：
 
 - **`afterConfigParsed(JsonObject config)`**（`default`）：把 Launcher 解析的 JSON 配置树合并进
   `ConfigElement.root()`，便于与 Keel 配置体系统一。
@@ -245,8 +281,3 @@ module com.example.myapp {
 - 仓库：[https://github.com/sinri/keel-app](https://github.com/sinri/keel-app)
 - Keel 框架：[https://github.com/sinri/keel](https://github.com/sinri/keel)
 - 许可证：GPL-3.0（见仓库 `LICENSE` 或 POM 中声明）
-
----
-
-*文档与 Keel-App 源码一致即可；若公共 README 中的示例仍写有 `runWithCommandLine(args)`
-，请以本文档与 `AppLifeCycleMixin#launch` 为准。*
