@@ -38,14 +38,11 @@ public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
         jsonObject.forEach(entry -> {
             String key = entry.getKey();
             var child = new ConfigElement(key);
-            try {
-                var r = jsonObject.getJsonObject(key);
-                transformJsonObjectToConfigElement(r, child);
-            } catch (Throwable throwable) {
-                Object value = entry.getValue();
-                if (value != null) {
-                    child.setElementValue(value.toString());
-                }
+            Object value = entry.getValue();
+            if (value instanceof JsonObject nestedJsonObject) {
+                transformJsonObjectToConfigElement(nestedJsonObject, child);
+            } else if (value != null) {
+                child.setElementValue(value.toString());
             }
             list.add(child);
         });
@@ -57,14 +54,11 @@ public interface KeelVertxApplicationHooks extends VertxApplicationHooks {
         jsonObject.forEach(entry -> {
             String key = entry.getKey();
             var child = configElement.ensureChild(key);
-            try {
-                var r = jsonObject.getJsonObject(key);
-                transformJsonObjectToConfigElement(r, child);
-            } catch (Throwable throwable) {
-                Object value = entry.getValue();
-                if (value != null) {
-                    child.setElementValue(value.toString());
-                }
+            Object value = entry.getValue();
+            if (value instanceof JsonObject nestedJsonObject) {
+                transformJsonObjectToConfigElement(nestedJsonObject, child);
+            } else if (value != null) {
+                child.setElementValue(value.toString());
             }
         });
     }
