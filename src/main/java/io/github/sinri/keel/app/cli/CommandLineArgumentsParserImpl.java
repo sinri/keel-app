@@ -15,15 +15,16 @@ import java.util.function.Function;
  */
 @NullMarked
 class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
-    private final Map<String, CommandLineOption> optionMap = new HashMap<>();
+    private final Map<String, CommandLineOptionSnapshot> optionMap = new HashMap<>();
     private final Map<String, String> nameToOptionIdMap = new HashMap<>();
 
     public void addOption(CommandLineOption option) throws CommandLineArgumentsDefinitionError {
-        if (optionMap.containsKey(option.id())) {
-            throw new CommandLineArgumentsDefinitionError("Duplicate named argument definition id: " + option.id());
+        var snapshot = CommandLineOptionSnapshot.from(option);
+        if (optionMap.containsKey(snapshot.id())) {
+            throw new CommandLineArgumentsDefinitionError("Duplicate named argument definition id: " + snapshot.id());
         }
 
-        Set<String> aliasSet = option.getAliasSet();
+        Set<String> aliasSet = snapshot.aliasSet();
         if (aliasSet.isEmpty()) {
             throw new CommandLineArgumentsDefinitionError("Option must have at least one alias");
         }
@@ -35,8 +36,8 @@ class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
             }
         }
 
-        optionMap.put(option.id(), option);
-        aliasSet.forEach(alias -> nameToOptionIdMap.put(alias, option.id()));
+        optionMap.put(snapshot.id(), snapshot);
+        aliasSet.forEach(alias -> nameToOptionIdMap.put(alias, snapshot.id()));
     }
 
 
@@ -59,7 +60,7 @@ class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
          */
 
         int mode = 0;
-        CommandLineOption currentOption = null;
+        CommandLineOptionSnapshot currentOption = null;
         for (String arg : args) {
             // if (arg == null) continue;
             if (mode == 0 || mode == 2) {
@@ -112,13 +113,13 @@ class CommandLineArgumentsParserImpl implements CommandLineArgumentsParser {
         for (var entry : options.entrySet()) {
             String optionId = entry.getKey();
             String optionValue = entry.getValue();
-            CommandLineOption option = optionMap.get(optionId);
-            Function<String, Boolean> valueValidator = option.getValueValidator();
+            CommandLineOptionSnapshot option = optionMap.get(optionId);
+            Function<String, Boolean> valueValidator = option.valueValidator();
             if (valueValidator != null && !option.isFlag() && optionValue != null) {
                 boolean valueValid = valueValidator.apply(optionValue);
                 if (!valueValid) {
                     throw new CommandLineArgumentsParseError(
-                            "Value for option " + (String.join("/", option.getAliasSet())) + " is not valid.");
+                            "Value for option " + (String.join("/", option.aliasSet())) + " is not valid.");
                 }
             }
             // System.out.printf("option[%s]: %s\n", optionId, option);

@@ -217,6 +217,66 @@ class CommandLineParserUnitTest {
         assertTrue(parser.parse(new String[]{"--available"}).readFlag("available"));
     }
 
+    @Test
+    void registeredOption_addedAlias_doesNotChangeParsingOrResults() throws CommandLineArgumentsParseError {
+        var option = new CommandLineOption().alias("a");
+        var parser = createParser(option);
+        var before = parser.parse(new String[]{"--a", "before"});
+
+        option.alias("b");
+
+        assertThrows(CommandLineArgumentsParseError.class,
+                () -> parser.parse(new String[]{"--b", "value"}));
+        var after = parser.parse(new String[]{"--a", "after"});
+        assertEquals("before", before.readOption("a"));
+        assertNull(before.readOption("b"));
+        assertEquals("after", after.readOption("a"));
+        assertNull(after.readOption("b"));
+
+        var anotherParser = createParser(option);
+        assertEquals("value", anotherParser.parse(new String[]{"--b", "value"}).readOption("a"));
+        assertThrows(CommandLineArgumentsDefinitionError.class, () -> parser.addOption(option));
+    }
+
+    @Test
+    void registeredOption_addedConflictingAlias_doesNotRedirectResults() throws CommandLineArgumentsParseError {
+        var first = new CommandLineOption().alias("first");
+        var parser = createParser(first, new CommandLineOption().alias("second"));
+        first.alias("second");
+
+        var firstOnly = parser.parse(new String[]{"--first", "one"});
+        assertEquals("one", firstOnly.readOption("first"));
+        assertNull(firstOnly.readOption("second"));
+        var both = parser.parse(new String[]{"--first", "one", "--second", "two"});
+        assertEquals("one", both.readOption("first"));
+        assertEquals("two", both.readOption("second"));
+    }
+
+    @Test
+    void registeredOption_flagMutation_doesNotChangeParsingOrExistingResults() throws CommandLineArgumentsParseError {
+        var option = new CommandLineOption().alias("value");
+        var parser = createParser(option);
+        var before = parser.parse(new String[]{"--value", "before"});
+
+        option.flag();
+
+        assertEquals("before", before.readOption("value"));
+        assertEquals("after", parser.parse(new String[]{"--value", "after"}).readOption("value"));
+        assertThrows(CommandLineArgumentsParseError.class, () -> parser.parse(new String[]{"--value"}));
+    }
+
+    @Test
+    void registeredOption_validatorReplacement_keepsOriginalValidation() throws CommandLineArgumentsParseError {
+        var option = new CommandLineOption().alias("value").setValueValidator("accepted"::equals);
+        var parser = createParser(option);
+
+        option.setValueValidator(value -> true);
+
+        assertEquals("accepted", parser.parse(new String[]{"--value", "accepted"}).readOption("value"));
+        assertThrows(CommandLineArgumentsParseError.class,
+                () -> parser.parse(new String[]{"--value", "rejected"}));
+    }
+
     // --- Parameter index boundary ---
 
     @Test

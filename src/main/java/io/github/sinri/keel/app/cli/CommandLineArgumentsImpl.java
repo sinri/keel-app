@@ -17,7 +17,7 @@ class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgum
     /**
      * 将选项ID映射到选项对象的映射表。
      */
-    private final Map<String, CommandLineOption> idToOptionMap = new HashMap<>();
+    private final Map<String, CommandLineOptionSnapshot> idToOptionMap = new HashMap<>();
     /**
      * 将选项长名称映射到选项ID的映射表。
      */
@@ -34,9 +34,9 @@ class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgum
     public CommandLineArgumentsImpl() {
     }
 
-    public void recordOption(CommandLineOption option, @Nullable String value) {
+    public void recordOption(CommandLineOptionSnapshot option, @Nullable String value) {
         idToOptionMap.put(option.id(), option);
-        Set<String> aliasSet = option.getAliasSet();
+        Set<String> aliasSet = option.aliasSet();
         for (var alias : aliasSet) {
             if (alias.isEmpty()) continue;
             nameToOptionIdMap.put(alias, option.id());
@@ -49,7 +49,7 @@ class CommandLineArgumentsImpl implements CommandLineArguments, CommandLineArgum
     public String readOption(String longName) {
         String optionId = nameToOptionIdMap.get(longName);
         if (optionId == null) return null;
-        CommandLineOption option = idToOptionMap.get(optionId);
+        CommandLineOptionSnapshot option = idToOptionMap.get(optionId);
         if (option == null) return null;
         if (option.isFlag()) return "";
         return idToOptionValueMap.get(optionId);

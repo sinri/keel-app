@@ -36,6 +36,16 @@ public interface CommandLineArgumentsParser {
 
     CommandLineArguments parse(String[] args) throws CommandLineArgumentsParseError;
 
+    /**
+     * 注册选项，并保存独立的不可变定义快照。
+     * <p>
+     * 后续修改原选项的别名、描述、标志状态或验证器，不影响本解析器及其解析结果。
+     * 验证器仅保存函数引用，其捕获的外部可变状态不会被复制。
+     * 注册失败不会留下部分定义；同一选项 ID 不能重复注册。
+     *
+     * @param option 要注册的选项
+     * @throws CommandLineArgumentsDefinitionError 如果 ID 重复、别名为空或与已注册选项冲突
+     */
     void addOption(CommandLineOption option) throws CommandLineArgumentsDefinitionError;
 
     default void addOption(Handler<CommandLineOption> optionHandler) throws CommandLineArgumentsDefinitionError {

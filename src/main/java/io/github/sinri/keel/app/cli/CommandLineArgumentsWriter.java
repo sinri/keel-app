@@ -33,7 +33,7 @@ interface CommandLineArgumentsWriter {
      * @param option 要记录的选项
      * @param value  选项的值，如果选项是标志则为null
      */
-    void recordOption(CommandLineOption option, @Nullable String value);
+    void recordOption(CommandLineOptionSnapshot option, @Nullable String value);
 
     /**
      * 将当前的记录结果转换为 KeelCliArgs 对象。
